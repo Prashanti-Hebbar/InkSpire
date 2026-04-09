@@ -1,13 +1,12 @@
-const express = require('express');
-const { createProduct, getProducts, getProductById, deleteProductById, updateProduct } = require('../Controller/productController');
+import express from "express";
+import * as controller from "../controllers/productController.js";
+import { verifyToken, isAdmin } from "../middleware/authMiddleware.js";
 
-const route = express.Router();
-const upload = require('../Middleware/imageUpload');
+const router = express.Router();
 
-route.post('/createProduct', upload.single('productimage'), createProduct);
-route.get('/getProducts', getProducts);
-route.get('/getProductById/:id', getProductById);
-route.delete('/deleteProductById/:id', deleteProductById);
-route.put('/updateProduct/:id',upload.single('productimage'), updateProduct);
+router.post("/", verifyToken, isAdmin, controller.create);
+router.get("/", controller.getAll);
+router.put("/:id", verifyToken, isAdmin, controller.update);
+router.delete("/:id", verifyToken, isAdmin, controller.remove);
 
-module.exports = route;
+export default router;
