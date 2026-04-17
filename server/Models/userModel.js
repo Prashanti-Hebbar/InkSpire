@@ -1,11 +1,12 @@
-import mongoose from "mongoose";
+const mongoose  = require('mongoose');
+const userschema  = new mongoose.Schema({
+    name:{type:String},
+    email:{type:String,unique:true},
+    password:{type:String},
+    phone:{type:Number},
+    address:{type:String}
+})
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  address: String,
-  role: { type: String, enum: ["user", "admin"], default: "admin" }
-}, { timestamps: true });
+module.exports = mongoose.model('User',userschema)
 
-export default mongoose.model("User", userSchema);
+// User -> Table name or collection name
