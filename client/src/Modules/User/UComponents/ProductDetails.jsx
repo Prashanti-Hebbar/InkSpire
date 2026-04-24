@@ -12,7 +12,7 @@ export default function ProductDetails() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/product/getProductById/${id}`)
+      .get(`http://localhost:5000/product/getProductById/${id}`)
       .then((res) => setProduct(res.data.product))
       .catch((err) => console.error(err));
   }, [id]);
@@ -78,7 +78,7 @@ export default function ProductDetails() {
             >
               <Box
                 component="img"
-                src={`http://localhost:3000/uploads/${product.productimage}`}
+                src={`http://localhost:5000/uploads/${product.productimage}`}
                 alt={product.name}
                 sx={{
                   width: "100%",

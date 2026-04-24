@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
+  Paper,
+  Checkbox,
+  IconButton,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function ViewProduct() {
   const [products, setProducts] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [sortBy, setSortBy] = useState("name");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,179 +34,145 @@ export default function ViewProduct() {
   }, []);
 
   const fetchProducts = async () => {
-    try {
-      const response = await fetch("/product/getProducts");
-      const data = await response.json();
-      if (response.ok) {
-        setProducts(data.products);
-      }
-    } catch (error) {
-      console.error(error);
+    const res = await fetch("/product/getProducts");
+    const data = await res.json();
+    setProducts(data.products || []);
+  };
+
+  const sorted = [...products].sort((a, b) =>
+    a[sortBy].toString().localeCompare(b[sortBy].toString())
+  );
+
+  const handleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selected.length === products.length) {
+      setSelected([]);
+    } else {
+      setSelected(products.map((p) => p._id));
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await fetch(`/product/deleteProductById/${id}`, {
-        method: "DELETE",
-      });
-      fetchProducts();
-    } catch (error) {
-      console.error(error);
-    }
+  const handleDelete = (id) => {
+    setSelected([id]);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    await Promise.all(
+      selected.map((id) =>
+        fetch(`/product/deleteProductById/${id}`, { method: "DELETE" })
+      )
+    );
+    setConfirmOpen(false);
+    setSelected([]);
+    fetchProducts();
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      {/* 🔥 HEADER */}
-      <Box mb={3}>
-        <Typography variant="h4" fontWeight={700}>
-          Products
-        </Typography>
-        <Typography color="text.secondary">
-          Manage your store products
-        </Typography>
-      </Box>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        p: 4,
+        background: "radial-gradient(circle at top, #f5f1e6, #e8dccb)",
+      }}
+    >
+      {/* HEADER */}
+      <Typography variant="h4" fontWeight={700} mb={3}>
+        Books Collection
+      </Typography>
 
-      {/* 📊 TABLE CARD */}
+      {/* ACTION BAR */}
+      {/* <Box display="flex" justifyContent="space-between" mb={2}>
+        <Button
+          disabled={!selected.length}
+          onClick={() => setConfirmOpen(true)}
+          sx={{ background: "#b91c1c", color: "#fff" }}
+        >
+          Delete ({selected.length})
+        </Button>
+
+        <Select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          size="small"
+        >
+          <MenuItem value="name">Sort by Name</MenuItem>
+          <MenuItem value="price">Sort by Price</MenuItem>
+        </Select>
+      </Box> */}
+
+      {/* TABLE */}
       <Paper
         sx={{
           borderRadius: 4,
-          overflow: "hidden",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+          backdropFilter: "blur(12px)",
+          background: "rgba(255,255,255,0.7)",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.1)",
         }}
       >
-        <TableContainer>
-          <Table>
-            {/* 🔵 HEADER */}
-            <TableHead>
-              <TableRow
-                sx={{
-                  background: "linear-gradient(90deg, #6366f1, #a855f7)",
-                }}
-              >
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>#</TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Product Name
-                </TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Price
-                </TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Quantity
-                </TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Description
-                </TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Image
-                </TableCell>
-                <TableCell
-                  align="center"
-                  sx={{ color: "#fff", fontWeight: 600 }}
-                >
-                  Actions
+        <Table>
+          <TableHead>
+            <TableRow sx={{ background: "#3e2f1c" }}>
+              <TableCell sx={{ color: "#fff" }}>Name</TableCell>
+              <TableCell sx={{ color: "#fff" }}>Price</TableCell>
+              <TableCell sx={{ color: "#fff" }}>Quantity</TableCell>
+              <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {sorted.map((p) => (
+              <TableRow key={p._id}>
+              
+
+                <TableCell>{p.name}</TableCell>
+                <TableCell>₹{p.price}</TableCell>
+                <TableCell>{p.quantity}</TableCell>
+
+                <TableCell>
+                  <Button
+                    size="small"
+                    onClick={() =>
+                      navigate(`/admin/product/update/${p._id}`)
+                    }
+                    sx={{ mr: 1, background: "#c8a97e", color: "#2b2115" }}
+                  >
+                    Update
+                  </Button>
+
+                  <IconButton
+                    onClick={() => handleDelete(p._id)}
+                    sx={{ color: "#b91c1c" }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
-            </TableHead>
-
-            {/* ⚪ BODY */}
-            <TableBody>
-              {products.length > 0 ? (
-                products.map((prod, index) => (
-                  <TableRow
-                    key={prod._id}
-                    sx={{
-                      transition: "0.2s",
-                      "&:hover": {
-                        backgroundColor: "#f9fafb",
-                      },
-                    }}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-
-                    <TableCell sx={{ fontWeight: 500 }}>{prod.name}</TableCell>
-
-                    <TableCell sx={{ color: "#6366f1", fontWeight: 600 }}>
-                      ₹{prod.price}
-                    </TableCell>
-
-                    <TableCell>{prod.quantity}</TableCell>
-
-                    <TableCell
-                      sx={{
-                        maxWidth: 200,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {prod.description}
-                    </TableCell>
-                    <TableCell>
-                      {prod.productimage ? (
-                        <img
-                          src={`http://localhost:3000/uploads/${prod.productimage}`}
-                          alt={prod.name}
-                          style={{
-                            width: "60px",
-                            height: "60px",
-                            objectFit: "cover",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      ) : (
-                        "No Image"
-                      )}
-                    </TableCell>
-
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() =>
-                          navigate(`/admin/product/update/${prod._id}`)
-                        }
-                        sx={{
-                          mr: 1,
-                          background:
-                            "linear-gradient(90deg, #6366f1, #a855f7)",
-                          borderRadius: 2,
-                          textTransform: "none",
-                        }}
-                      >
-                        Update
-                      </Button>
-
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleDelete(prod._id)}
-                        sx={{
-                          background: "#ef4444",
-                          borderRadius: 2,
-                          textTransform: "none",
-                          "&:hover": { background: "#dc2626" },
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
-                    <Typography color="text.secondary">
-                      No products found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
       </Paper>
+
+      {/* CONFIRM MODAL */}
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Delete {selected.length} book(s)?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

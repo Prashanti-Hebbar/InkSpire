@@ -20,7 +20,7 @@ export default function Register() {
   };
 
   const handleregister = () => {
-    axios.post("http://localhost:3000/user/registerUser", formdata)
+    axios.post("http://localhost:5000/user/registerUser", formdata)
       .then(() => navigate("/login"))
       .catch(() => alert("Registration failed"));
   };

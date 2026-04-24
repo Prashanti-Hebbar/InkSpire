@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const MONGO_URL = "mongodb://localhost:27017/bookstore";
 // mongodb://localhost:27017 = connection string
-// mernbe = database name
+// bookstore = database name
 
 const dbconnection = async () => {
     try {

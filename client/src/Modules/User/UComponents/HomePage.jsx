@@ -11,7 +11,7 @@ export default function HomePage() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/product/getProducts")
+      .get("http://localhost:5000/product/getProducts")
       .then((res) => setProducts(res.data.products))
       .catch((err) => console.error(err));
   }, []);
@@ -193,7 +193,7 @@ export default function HomePage() {
         </Typography>
 
         <Box display="flex" gap={2} flexWrap="wrap">
-          {["Fantasy", "Technology", "Romance", "Self Growth"].map((cat) => (
+          {["Fantasy", "Technology", "Self Growth"].map((cat) => (
             <motion.div key={cat} whileHover={{ y: -6 }}>
               <Box
                 sx={{

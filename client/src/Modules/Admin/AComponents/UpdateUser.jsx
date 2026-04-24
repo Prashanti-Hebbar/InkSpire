@@ -28,7 +28,7 @@ export default function UpdateUser() {
   // 🔹 Fetch user data
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/user/getUserById/${id}`)
+      .get(`http://localhost:5000/user/getUserById/${id}`)
       .then((res) => {
         if (res.data.user) {
           setUser(res.data.user);
@@ -49,7 +49,7 @@ export default function UpdateUser() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios.put(`http://localhost:3000/user/updateuser/${id}`, user)
+    axios.put(`http://localhost:5000/user/updateuser/${id}`, user)
       .then((res) => {
         setSuccess(true);
 

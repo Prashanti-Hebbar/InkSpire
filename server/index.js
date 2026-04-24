@@ -7,7 +7,7 @@ const cors = require('cors');
 const app = express();
 // app is an instance of express which we will use to define our routes and middleware and handle incoming requests and send response to the client
 
-const PORT = 3000;
+const PORT = 5000;
 // port number on which our server will listen for incoming requests
 
 // we will use app.listen() method to start our server and listen for incoming requests on the specified port number

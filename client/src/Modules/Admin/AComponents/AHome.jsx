@@ -1,130 +1,90 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import PeopleIcon from "@mui/icons-material/People";
-import CategoryIcon from "@mui/icons-material/Category";
-import BookOnlineIcon from "@mui/icons-material/BookOnline";
-
-const stats = [
-  {
-    title: "Users",
-    icon: <PeopleIcon />,
-    color: "#3b82f6",
-    fetchCount: async () => {
-      const res = await fetch("/user/getUser");
-      const data = await res.json();
-      return data.allusers?.length || 0;
-    },
-  },
-  {
-    title: "Categories",
-    icon: <CategoryIcon />,
-    color: "#10b981",
-    fetchCount: () => {
-      const stored = JSON.parse(localStorage.getItem("categories")) || [];
-      return stored.length;
-    },
-  },
-  {
-    title: "Products",
-    icon: <BookOnlineIcon />,
-    color: "#f59e0b",
-    fetchCount: async () => {
-      const res = await fetch("/product/getProducts");
-      const data = await res.json();
-      return data.products?.length || 0;
-    },
-  },
-];
+import { Box, Typography, Paper, Grid } from "@mui/material";
+import { motion } from "framer-motion";
 
 export default function AHome() {
-  const [counts, setCounts] = useState({});
+  const [stats, setStats] = useState({
+    users: 0,
+    products: 0,
+    categories: 0,
+  });
 
   useEffect(() => {
-    stats.forEach(async (s) => {
-      const value = await s.fetchCount();
-      setCounts((prev) => ({ ...prev, [s.title]: value }));
-    });
+    const loadData = async () => {
+      const users = await fetch("/user/getUser").then((r) => r.json());
+      const products = await fetch("/product/getProducts").then((r) =>
+        r.json(),
+      );
+
+      setStats({
+        users: users.allusers?.length || 0,
+        products: products.products?.length || 0,
+        categories:
+          JSON.parse(localStorage.getItem("categories"))?.length || 0,
+      });
+    };
+
+    loadData();
   }, []);
 
-  return (
-    <Box
-      sx={{
-        px: { xs: 2, md: 6 },
-        py: 4,
-        background: "#f5f7fb",
-        minHeight: "100vh",
-      }}
-    >
-      <Typography variant="h4" fontWeight={700} mb={5}>
-        Dashboard
-      </Typography>
+  const cards = [
+    { title: "Users", value: stats.users },
+    { title: "Products", value: stats.products },
+    { title: "Categories", value: stats.categories },
+  ];
 
-      <Grid container spacing={4}>
-        {stats.map((stat) => (
-          <Grid item xs={12} sm={6} md={4} key={stat.title}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                borderRadius: 4,
-                background: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                gap: 3,
-                border: "1px solid #eee",
-                transition: "all 0.25s ease",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
-                },
-              }}
-            >
-              <Box
+  return (
+    <Box sx={{ position: "relative" }}>
+      {/* 🔥 HEADER */}
+      <Box
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          mb: 5,
+          background: "linear-gradient(135deg, #3e2f1c, #2b2115)",
+          color: "#fdf6e3",
+        }}
+      >
+        <Typography variant="h4" fontWeight={700}>
+          Welcome Back
+        </Typography>
+        <Typography sx={{ opacity: 0.8 }}>
+          Manage your bookstore efficiently
+        </Typography>
+      </Box>
+
+      {/* 🔥 STATS */}
+      <Grid container spacing={3}>
+        {cards.map((c) => (
+          <Grid item xs={12} md={4} key={c.title}>
+            <motion.div whileHover={{ y: -5 }}>
+              <Paper
                 sx={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 3,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: stat.color,
-                  color: "#fff",
-                  fontSize: 30,
+                  p: 4,
+                  borderRadius: 4,
+                  backdropFilter: "blur(12px)",
+                  background: "rgba(255,255,255,0.6)",
                 }}
               >
-                {stat.icon}
-              </Box>
-
-              <Box>
-                <Typography color="text.secondary" fontSize={14}>
-                  {stat.title}
+                <Typography color="text.secondary">
+                  {c.title}
                 </Typography>
-
-                <Typography variant="h4" fontWeight={700}>
-                  {counts[stat.title] ?? "..."}
+                <Typography variant="h3" fontWeight={700}>
+                  {c.value}
                 </Typography>
-              </Box>
-            </Paper>
+              </Paper>
+            </motion.div>
           </Grid>
         ))}
       </Grid>
 
-      <Paper
-        sx={{
-          mt: 6,
-          p: 4,
-          borderRadius: 4,
-          border: "1px solid #eee",
-        }}
-      >
-        <Typography variant="h6" fontWeight={600} mb={1}>
+      {/* 🔥 OVERVIEW */}
+      <Paper sx={{ mt: 5, p: 4, borderRadius: 4 }}>
+        <Typography variant="h6" fontWeight={600}>
           Overview
         </Typography>
-
         <Typography color="text.secondary">
-          Monitor platform statistics from this dashboard. Use the sidebar to
-          manage users, categories, and products.
+          Track your bookstore performance and manage everything from one place.
         </Typography>
       </Paper>
     </Box>

@@ -1,21 +1,31 @@
-import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Button
+  Paper,
+  Checkbox,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 export default function ViewCategory() {
   const [categories, setCategories] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [sortBy, setSortBy] = useState("name");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,127 +33,172 @@ export default function ViewCategory() {
   }, []);
 
   const fetchCategories = () => {
-    axios.get("http://localhost:3000/category/getCategories")
-      .then(res => setCategories(res.data.categories))
-      .catch(err => console.error(err));
+    axios
+      .get("http://localhost:5000/category/getCategories")
+      .then((res) => setCategories(res.data.categories))
+      .catch(console.error);
+  };
+
+  // 🔥 SORT
+  const sorted = [...categories].sort((a, b) =>
+    a[sortBy].localeCompare(b[sortBy])
+  );
+
+  // 🔥 SELECT
+  const handleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selected.length === categories.length) {
+      setSelected([]);
+    } else {
+      setSelected(categories.map((c) => c._id));
+    }
   };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:3000/category/deleteCategory/${id}`)
-      .then(() => fetchCategories())
-      .catch(err => console.error(err));
+    setSelected([id]);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    Promise.all(
+      selected.map((id) =>
+        axios.delete(`http://localhost:5000/category/deleteCategory/${id}`)
+      )
+    ).then(() => {
+      fetchCategories();
+      setSelected([]);
+      setConfirmOpen(false);
+    });
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-
+    <Box
+      sx={{
+        minHeight: "100vh",
+        p: 4,
+        background: "radial-gradient(circle at top, #f5f1e6, #e8dccb)",
+      }}
+    >
       {/* 🔥 HEADER */}
-      <Box mb={3}>
+      <Box
+        sx={{
+          mb: 4,
+          p: 4,
+          borderRadius: 4,
+          background: "linear-gradient(135deg, #3e2f1c, #2b2115)",
+          color: "#fdf6e3",
+          boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
+        }}
+      >
         <Typography variant="h4" fontWeight={700}>
           Categories
         </Typography>
-        <Typography color="text.secondary">
-          Manage your product categories
+        <Typography sx={{ opacity: 0.8 }}>
+          Organize your bookstore genres
         </Typography>
       </Box>
 
-      {/* 📊 TABLE CARD */}
+      {/* ACTION BAR */}
+      {/* <Box display="flex" justifyContent="space-between" mb={2}>
+        <Button
+          disabled={!selected.length}
+          onClick={() => setConfirmOpen(true)}
+          sx={{ background: "#b91c1c", color: "#fff" }}
+        >
+          Delete ({selected.length})
+        </Button>
+
+        <Select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          size="small"
+          sx={{ background: "rgba(255,255,255,0.6)", borderRadius: 2 }}
+        >
+          <MenuItem value="name">Sort by Name</MenuItem>
+        </Select>
+      </Box> */}
+
+      {/* TABLE */}
       <Paper
         sx={{
           borderRadius: 4,
-          overflow: "hidden",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
+          backdropFilter: "blur(12px)",
+          background: "rgba(255,255,255,0.7)",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.1)",
         }}
       >
-        <TableContainer>
-          <Table>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ background: "#3e2f1c" }}>
+              
+              <TableCell sx={{ color: "#fff" }}>Category</TableCell>
+              <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
 
-            {/* 🔵 HEADER */}
-            <TableHead>
+          <TableBody>
+            {sorted.map((cat) => (
               <TableRow
+                key={cat._id}
                 sx={{
-                  background: "linear-gradient(90deg, #6366f1, #a855f7)"
+                  "&:hover": {
+                    background: "rgba(200,169,126,0.15)",
+                  },
                 }}
               >
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  #
-                </TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
-                  Category Name
-                </TableCell>
-                <TableCell align="center" sx={{ color: "#fff", fontWeight: 600 }}>
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
+                
 
-            {/* ⚪ BODY */}
-            <TableBody>
-              {categories.length > 0 ? (
-                categories.map((cat, index) => (
-                  <TableRow
-                    key={cat._id}
+                <TableCell>{cat.name}</TableCell>
+
+                <TableCell>
+                  <Button
+                    size="small"
+                    onClick={() =>
+                      navigate(`/admin/category/update/${cat._id}`)
+                    }
                     sx={{
-                      transition: "0.2s",
-                      "&:hover": {
-                        backgroundColor: "#f9fafb"
-                      }
+                      mr: 1,
+                      background: "#c8a97e",
+                      color: "#2b2115",
                     }}
                   >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell sx={{ fontWeight: 500 }}>
-                      {cat.name}
-                    </TableCell>
+                    Update
+                  </Button>
 
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() =>
-                          navigate(`/admin/category/update/${cat._id}`)
-                        }
-                        sx={{
-                          mr: 1,
-                          background:
-                            "linear-gradient(90deg, #6366f1, #a855f7)",
-                          borderRadius: 2,
-                          textTransform: "none"
-                        }}
-                      >
-                        Update
-                      </Button>
-
-                      <Button
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleDelete(cat._id)}
-                        sx={{
-                          background: "#ef4444",
-                          borderRadius: 2,
-                          textTransform: "none",
-                          "&:hover": { background: "#dc2626" }
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} align="center" sx={{ py: 5 }}>
-                    <Typography color="text.secondary">
-                      No categories found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-
-          </Table>
-        </TableContainer>
+                  <Button
+                    size="small"
+                    onClick={() => handleDelete(cat._id)}
+                    sx={{ background: "#b91c1c", color: "#fff" }}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </Paper>
 
+      {/* CONFIRM MODAL */}
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          Delete {selected.length} category(s)?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -1,18 +1,23 @@
 const userTable = require("../Models/userModel");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "product-crud";
+const bcrypt = require("bcryptjs");
 
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, phone, address } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
     const useremail = await userTable.findOne({ email });
+    const hashedPassword = await bcrypt.hash(password, 10);
     if (useremail) {
       return res.status(400).json({ message: "email already exists" });
     }
     const userDetails = new userTable({
       name,
       email,
-      password,
+      password: hashedPassword,
       phone,
       address,
     });
@@ -21,7 +26,8 @@ const registerUser = async (req, res) => {
       .status(201)
       .json({ message: "user added successfully", udata: userDetails });
   } catch (error) {
-    console.log(error);
+    console.log(error.response);
+    alert(err.response?.data?.message || "Registration failed");
     res.status(500).json({ message: "server error", error });
   }
 };
@@ -29,16 +35,31 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userTable.findOne({ email, password });
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields required" });
+    }
+    const user = await userTable.findOne({ email });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "login failed"
+        message: "User not found",
       });
     }
 
-    const token = jwt.sign({ id: user._id }, SECRET_KEY);
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password",
+      });
+    }
+
+    const token = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, {
+      expiresIn: "1d",
+    });
 
     res.json({
       success: true,
@@ -46,10 +67,10 @@ const loginUser = async (req, res) => {
       token,
       user: {
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (error) {
     res.status(500).json({ message: "server error", error });
   }
@@ -112,11 +133,11 @@ const updateUser = async (req, res) => {
 
 const getprofile = async (req, res) => {
   try {
-    const user = await userTable.findById(req.userid)
-    res.json({success:true, udata:user})
+    const user = await userTable.findById(req.userid);
+    res.json({ success: true, udata: user });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({message:"server error"})
+    console.log(error);
+    res.status(500).json({ message: "server error" });
   }
 };
 
@@ -127,7 +148,7 @@ const updateProfile = async (req, res) => {
     const updatedUser = await userTable.findByIdAndUpdate(
       req.userid, // ✅ from token middleware
       { name, email, phone, address },
-      { new: true }
+      { new: true },
     );
 
     res.json({
@@ -149,5 +170,5 @@ module.exports = {
   deleteUserById,
   updateUser,
   getprofile,
-  updateProfile
+  updateProfile,
 };

@@ -39,7 +39,7 @@ export default function Topbar() {
 
   const settings = token
     ? [
-        { name: "Profile", path: "/user/myprofile" },
+        { name: "Profile", path: "/user/getprofile" },
         { name: "Logout", path: "/login" },
       ]
     : [

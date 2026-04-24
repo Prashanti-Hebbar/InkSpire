@@ -27,7 +27,7 @@ export default function UpdateProduct() {
   // 🔹 GET product by ID
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/product/getProductById/${id}`)
+      .get(`http://localhost:5000/product/getProductById/${id}`)
       .then((res) => {
         setProduct(res.data.product);
       })
@@ -52,7 +52,7 @@ export default function UpdateProduct() {
 
     try {
       await axios.put(
-        `http://localhost:3000/product/updateProduct/${id}`,
+        `http://localhost:5000/product/updateProduct/${id}`,
         form,
         {
           headers: {
@@ -124,7 +124,7 @@ export default function UpdateProduct() {
             sx={{ mb: 2 }}
             InputLabelProps={{ shrink: true }}
           />
-          <img src={`http://localhost:3000/uploads/${product.productimage}`} alt="Current" width={150} />
+          <img src={`http://localhost:5000/uploads/${product.productimage}`} alt="Current" width={150} />
 
           <TextField
             label="Description"

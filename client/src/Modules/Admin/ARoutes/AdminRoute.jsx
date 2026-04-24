@@ -16,13 +16,12 @@ import ManageCategories from "../AComponents/ManageCategories";
 import UpdateUser from "../AComponents/UpdateUser";
 
 export default function AdminRoute() {
-  const token = localStorage.getItem("AdminToken");
-
+const token = localStorage.getItem("UserToken");
+const role = localStorage.getItem("role");
   // ❌ NOT LOGGED IN → show only login page
-  if (!token) {
-    return <Navigate to="/admin/login" />;
-
-  }
+  if (!token || role !== "admin") {
+  return <Navigate to="/login" />;
+}
 
   // ✅ LOGGED IN → show admin panel
   return (

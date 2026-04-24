@@ -41,7 +41,7 @@ export default function Bookingform() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/product/getProductById/${productId}`)
+      .get(`http://localhost:5000/product/getProductById/${productId}`)
       .then((res) => setPrice(res.data.product.price))
       .catch((error) => console.log(error));
   }, []);
@@ -52,7 +52,7 @@ export default function Bookingform() {
     setLoading(true);
     try {
       await axios.post(
-        "http://localhost:3000/booking/createbooking",
+        "http://localhost:5000/booking/createbooking",
         { ...booking, productId },
         { headers: { "auth-token": utoken } }
       );

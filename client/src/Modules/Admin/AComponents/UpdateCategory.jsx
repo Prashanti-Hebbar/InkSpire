@@ -21,7 +21,7 @@ export default function UpdateCategory() {
 
   // 🔹 GET category by ID
   useEffect(() => {
-    axios.get(`http://localhost:3000/category/getCategoryById/${id}`)
+    axios.get(`http://localhost:5000/category/getCategoryById/${id}`)
       .then(res => {
         setCategory(res.data.category.name);
       })
@@ -33,7 +33,7 @@ export default function UpdateCategory() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    axios.put(`http://localhost:3000/category/UpdateCategory/${id}`, {
+    axios.put(`http://localhost:5000/category/UpdateCategory/${id}`, {
       name: category
     })
       .then(() => {

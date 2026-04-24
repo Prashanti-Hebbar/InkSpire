@@ -1,88 +1,179 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
-  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, IconButton,
-} from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import PersonIcon from '@mui/icons-material/Person'
+  Box,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Avatar,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PersonIcon from "@mui/icons-material/Person";
+import { motion } from "framer-motion";
 
 export default function Manageuser() {
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('userdetails')) || []
-    setUsers(stored)
-  }, [])
+    const stored = JSON.parse(localStorage.getItem("userdetails")) || [];
+    setUsers(stored);
+  }, []);
 
   const handleDelete = (index) => {
-    const updated = users.filter((_, i) => i !== index)
-    setUsers(updated)
-    localStorage.setItem('userdetails', JSON.stringify(updated))
-  }
+    const updated = users.filter((_, i) => i !== index);
+    setUsers(updated);
+    localStorage.setItem("userdetails", JSON.stringify(updated));
+  };
 
   return (
-    <Box>
-      <Typography variant="h4" fontWeight={700} mb={1}>
-        Manage Users
-      </Typography>
-      <Typography variant="body1" color="text.secondary" mb={4}>
-        View and manage all registered users.
-      </Typography>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "radial-gradient(circle at top, #f5f1e6, #e8dccb)",
+        p: { xs: 2, md: 4 },
+      }}
+    >
+      {/* 🔥 HEADER */}
+      <Box
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          mb: 4,
+          background: "linear-gradient(135deg, #3e2f1c, #2b2115)",
+          color: "#fdf6e3",
+          boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
+        }}
+      >
+        <Typography variant="h4" fontWeight={700}>
+          Manage Users
+        </Typography>
+        <Typography sx={{ opacity: 0.8 }}>
+          View and manage all registered readers
+        </Typography>
+      </Box>
 
-      <Paper elevation={0} sx={{
-        borderRadius: 3,
-        overflow: 'hidden',
-        background: 'rgba(255,255,255,0.9)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(0,0,0,0.05)',
-      }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>#</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>Name</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>Email</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>Phone</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>Address</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }}>Password</TableCell>
-                <TableCell sx={{ color: '#fff', fontWeight: 700 }} align="center">Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.length > 0 ? users.map((user, index) => (
-                <TableRow key={index} sx={{
-                  '&:hover': { bgcolor: 'rgba(102,126,234,0.05)' },
-                  transition: 'background 0.2s',
-                }}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <PersonIcon sx={{ color: '#667eea', fontSize: 20 }} />
-                      {user.name}
-                    </Box>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{user.address}</TableCell>
-                  <TableCell>{user.password}</TableCell>
-                  <TableCell align="center">
-                    <IconButton color="error" onClick={() => handleDelete(index)} size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+      {/* 🔥 TABLE CONTAINER */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <Paper
+          sx={{
+            borderRadius: 4,
+            overflow: "hidden",
+            backdropFilter: "blur(12px)",
+            background: "rgba(255,255,255,0.65)",
+            border: "1px solid rgba(0,0,0,0.05)",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.1)",
+          }}
+        >
+          <TableContainer>
+            <Table>
+              {/* 🔥 HEADER */}
+              <TableHead>
+                <TableRow
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #3e2f1c, #2b2115)",
+                  }}
+                >
+                  {["#", "Name", "Email", "Phone", "Address", "Action"].map(
+                    (head) => (
+                      <TableCell
+                        key={head}
+                        sx={{
+                          color: "#fdf6e3",
+                          fontWeight: 700,
+                        }}
+                        align={head === "Action" ? "center" : "left"}
+                      >
+                        {head}
+                      </TableCell>
+                    )
+                  )}
                 </TableRow>
-              )) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">No users found</Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+              </TableHead>
+
+              {/* 🔥 BODY */}
+              <TableBody>
+                {users.length > 0 ? (
+                  users.map((user, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{
+                        transition: "0.3s",
+                        "&:hover": {
+                          background: "rgba(200,169,126,0.15)",
+                          transform: "scale(1.01)",
+                        },
+                      }}
+                    >
+                      <TableCell>{index + 1}</TableCell>
+
+                      {/* NAME */}
+                      <TableCell>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
+                          <Avatar
+                            sx={{
+                              width: 36,
+                              height: 36,
+                              background: "#c8a97e",
+                              color: "#2b2115",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {user.name?.charAt(0)}
+                          </Avatar>
+                          <Typography fontWeight={600}>
+                            {user.name}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone}</TableCell>
+                      <TableCell>{user.address}</TableCell>
+
+                      {/* ACTION */}
+                      <TableCell align="center">
+                        <IconButton
+                          onClick={() => handleDelete(index)}
+                          sx={{
+                            color: "#b91c1c",
+                            transition: "0.3s",
+                            "&:hover": {
+                              background: "rgba(185,28,28,0.1)",
+                              transform: "scale(1.2)",
+                            },
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <Typography color="text.secondary">
+                        No readers found 📚
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </motion.div>
     </Box>
-  )
+  );
 }

@@ -45,11 +45,28 @@ export default function MyProfile() {
   };
 
   const viewprofile = async () => {
-    const res = await fetch("http://localhost:3000/user/getprofile", {
-      headers: { "auth-token": token },
-    });
-    const data = await res.json();
-    setFormdata(data.udata);
+    try {
+      const res = await fetch("http://localhost:5000/user/getprofile", {
+        headers: { "auth-token": token },
+      });
+
+      const data = await res.json();
+
+      if (data && data.udata) {
+        setFormdata(data.udata);
+      } else {
+        console.error("Invalid profile data:", data);
+        // fallback instead of crashing
+        setFormdata({
+          name: "",
+          email: "",
+          phone: "",
+          address: "",
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    }
   };
 
   useEffect(() => {
@@ -58,7 +75,7 @@ export default function MyProfile() {
 
   const handleUpdate = async () => {
     const response = await axios.put(
-      "http://localhost:3000/user/updateprofile",
+      "http://localhost:5000/user/updateprofile",
       formdata,
       { headers: { "auth-token": token } },
     );

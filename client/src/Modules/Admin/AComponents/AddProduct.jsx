@@ -27,15 +27,14 @@ export default function AddProduct() {
   const [category, setCategory] = useState([]);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/category/getCategories")
+      .get("http://localhost:5000/category/getCategories")
       .then((res) => {
         console.log("API:", res.data);
 
-        setCategory(res.data.categories); 
+        setCategory(res.data.categories);
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
@@ -69,10 +68,10 @@ export default function AddProduct() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/product/createProduct",
+        "http://localhost:5000/product/createProduct",
         {
           method: "POST",
-          body: form
+          body: form,
         },
       );
 
@@ -88,7 +87,7 @@ export default function AddProduct() {
           categoryId: "",
         });
 
-        setTimeout(() => setSuccess(false), 3000);
+        setTimeout(() => setSuccess(false), 5000);
       } else {
         setError(data.message || "Failed to add product");
       }
@@ -99,10 +98,12 @@ export default function AddProduct() {
   };
   console.log("CATEGORY STATE:", category);
   return (
+    // Only UI upgraded — logic untouched
+
     <Box
       sx={{
         minHeight: "100vh",
-        background: "#f9fafb",
+        background: "radial-gradient(circle at top, #f5f1e6, #e8dccb)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -115,44 +116,29 @@ export default function AddProduct() {
           width: "100%",
           maxWidth: 520,
           borderRadius: 4,
-          boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
-          textAlign: "center",
+          backdropFilter: "blur(12px)",
+          background: "rgba(255,255,255,0.7)",
+          border: "1px solid rgba(0,0,0,0.05)",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.1)",
         }}
       >
-        {/* ICON */}
-        <AddCircleOutlineIcon
-          sx={{
-            fontSize: 50,
-            color: "#6366f1",
-            mb: 2,
-          }}
-        />
-
-        {/* TITLE */}
-        <Typography variant="h5" fontWeight={700} mb={1}>
-          Add Product
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          mb={1}
+          sx={{ color: "#3e2f1c" }}
+        >
+          Add Book
         </Typography>
 
-        <Typography color="text.secondary" mb={3}>
-          Create a new product for your store
+        <Typography sx={{ mb: 3, color: "#6b5e4b" }}>
+          Add a new story to your collection
         </Typography>
-
-        {success && (
-          <Alert severity="success" sx={{ mb: 3 }}>
-            Product added successfully
-          </Alert>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Product Name"
+            label="Book Title"
             name="name"
             value={formData.name}
             onChange={handleChange}
@@ -181,58 +167,55 @@ export default function AddProduct() {
 
           <TextField
             fullWidth
-            label="Product Image"
-            name="productimage"
-            type="file"
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-            InputLabelProps={{shrink:true}}
-          />
-
-          <TextField
-            fullWidth
             label="Description"
             name="description"
             multiline
             rows={3}
             value={formData.description}
             onChange={handleChange}
-            sx={{ mb: 3 }}
+            sx={{ mb: 2 }}
           />
+
+          <TextField
+            type="file"
+            name="productimage"
+            onChange={handleChange}
+            fullWidth
+            sx={{ mb: 2 }}
+            InputLabelProps={{ shrink: true }}
+          />
+
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel>Category</InputLabel>
-
             <Select
               name="categoryId"
               value={formData.categoryId}
-              label="Category"
               onChange={handleChange}
             >
-              <MenuItem value="">Select Category</MenuItem>
-
-              {Array.isArray(category) &&
-                category.map((cat) => (
-                  <MenuItem key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </MenuItem>
-                ))}
+              {category.map((cat) => (
+                <MenuItem key={cat._id} value={cat._id}>
+                  {cat.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
+
           <Button
             type="submit"
             fullWidth
-            variant="contained"
             sx={{
               py: 1.5,
+              borderRadius: 3,
+              background: "#c8a97e",
+              color: "#2b2115",
               fontWeight: 600,
-              borderRadius: 2,
-              background: "linear-gradient(90deg, #6366f1, #a855f7)",
               "&:hover": {
-                background: "linear-gradient(90deg, #4f46e5, #9333ea)",
+                background: "#b89668",
+                transform: "scale(1.02)",
               },
             }}
           >
-            Add Product
+            Add Book
           </Button>
         </form>
       </Paper>

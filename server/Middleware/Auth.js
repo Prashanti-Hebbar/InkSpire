@@ -1,5 +1,6 @@
-const jwt = require("jsonwebtoken")
-const SECRET_KEY = "product-crud"
+require("dotenv").config();
+const SECRET_KEY = process.env.SECRET_KEY;
+const jwt = require("jsonwebtoken");
 
 const authuser = (req, res, next) => {
   try {
@@ -11,9 +12,10 @@ const authuser = (req, res, next) => {
       });
     }
 
-    const userinfo = jwt.verify(usertoken, "product-crud");
+    const userinfo = jwt.verify(usertoken, SECRET_KEY);
 
     req.userid = userinfo.id;
+    req.role = userinfo.role;
 
     next();
   } catch (error) {
@@ -24,4 +26,11 @@ const authuser = (req, res, next) => {
   }
 };
 
-module.exports = authuser
+const adminMiddleware = (req, res, next) => {
+  if (req.role !== "admin") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+  next();
+};
+
+module.exports = authuser, adminMiddleware;

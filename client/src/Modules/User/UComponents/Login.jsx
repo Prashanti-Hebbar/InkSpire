@@ -7,28 +7,38 @@ import { motion } from "framer-motion";
 export default function Login() {
   const [login, setLogin] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = () => {
-    axios.post("http://localhost:3000/user/login", login)
-      .then((res) => {
-        if (res.data.success) {
-          localStorage.setItem("UserToken", res.data.token);
-          localStorage.setItem("username", res.data.user.name);
-          navigate("/");
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.post("http://localhost:5000/user/login", login);
+
+      if (res.data.success) {
+        localStorage.setItem("UserToken", res.data.token);
+        localStorage.setItem("username", res.data.user.name);
+        localStorage.setItem("role", res.data.user.role);
+
+        if (res.data.user.role === "admin") {
+          navigate("/admin");
         } else {
-          alert("Login failed");
+          navigate("/user");
         }
-      })
-      .catch(() => alert("Invalid credentials"));
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      
       {/* LEFT - ATMOSPHERE */}
       <Box
         sx={{
@@ -65,19 +75,27 @@ export default function Login() {
           background: "#f5f1e6",
         }}
       >
-        <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
           <Box sx={{ width: 360 }}>
-            
             <Typography variant="h4" fontWeight={700} mb={3} color="#3e2f1c">
               Welcome Back
             </Typography>
 
             <Input label="Email" name="email" onChange={handleChange} />
-            <Input label="Password" name="password" type="password" onChange={handleChange} />
+            <Input
+              label="Password"
+              name="password"
+              type="password"
+              onChange={handleChange}
+            />
 
             <Button
               fullWidth
               onClick={handleLogin}
+              disabled={loading}
               sx={{
                 mt: 2,
                 py: 1.5,
@@ -87,7 +105,7 @@ export default function Login() {
                 "&:hover": { background: "#2b2115" },
               }}
             >
-              Enter Store →
+              {loading ? "Logging in..." : "Enter Store →"}
             </Button>
 
             <Typography mt={3}>
@@ -99,7 +117,6 @@ export default function Login() {
                 Create account
               </span>
             </Typography>
-
           </Box>
         </motion.div>
       </Box>

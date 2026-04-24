@@ -10,7 +10,7 @@ import Login from "../UComponents/Login";
 import ProductDetails from "../UComponents/ProductDetails";
 import MyProfile from "../UComponents/MyProfile";
 import Bookingform from "../UComponents/Bookingform";
-
+import UserProtectedRoute from "../UComponents/UserProtectedRoute";
 
 function AppContent() {
   const location = useLocation();
@@ -27,7 +27,14 @@ function AppContent() {
         <Route path="/products" element={<Products />} />
         <Route path="/login" element={<Login />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/myprofile" element={<MyProfile />} />
+        <Route
+          path="/getprofile"
+          element={
+            <UserProtectedRoute>
+              <MyProfile />
+            </UserProtectedRoute>
+          }
+        />
         <Route path="/bookingform/:productId" element={<Bookingform />} />
       </Routes>
     </div>

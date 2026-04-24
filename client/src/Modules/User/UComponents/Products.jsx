@@ -47,7 +47,7 @@ export default function Products() {
 
   const fetchCategories = () => {
     axios
-      .get("http://localhost:3000/category/getCategories")
+      .get("http://localhost:5000/category/getCategories")
       .then((res) => setCategories(res.data.categories))
       .catch((err) => console.error(err));
   };
@@ -119,11 +119,6 @@ export default function Products() {
             >
               {/* HEADER */}
               <CardHeader
-                avatar={
-                  <Avatar sx={{ bgcolor: red[500] }}>
-                    {pdata.name?.charAt(0)}
-                  </Avatar>
-                }
                 action={
                   <IconButton>
                     <MoreVertIcon />
@@ -137,9 +132,13 @@ export default function Products() {
               <Box sx={{ overflow: "hidden" }}>
                 <motion.div whileHover={{ scale: 1.1 }}>
                   <CardMedia
+                    sx={{
+                      height: 180, // ✅ FIXED (was 300 → breaking layout)
+                      objectFit: "contain",
+                    }}
                     component="img"
                     height="200"
-                    image={`http://localhost:3000/uploads/${pdata.productimage}`}
+                    image={`http://localhost:5000/uploads/${pdata.productimage}`}
                     alt={pdata.name}
                   />
                 </motion.div>
@@ -169,9 +168,7 @@ export default function Products() {
                 }}
               >
                 <Button
-                  onClick={() =>
-                    navigate(`/user/bookingform/${pdata._id}`)
-                  }
+                  onClick={() => navigate(`/user/bookingform/${pdata._id}`)}
                   size="small"
                   variant="contained"
                   sx={{
@@ -186,9 +183,7 @@ export default function Products() {
                 </Button>
 
                 <Button
-                  onClick={() =>
-                    navigate(`/user/product/${pdata._id}`)
-                  }
+                  onClick={() => navigate(`/user/product/${pdata._id}`)}
                   size="small"
                   variant="outlined"
                   sx={{
