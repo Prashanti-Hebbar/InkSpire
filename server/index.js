@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const dbconnection = require('./db');
 const cors = require('cors');
@@ -36,3 +37,17 @@ app.use('/category', require('./Routes/categoryRoutes'));
 app.use('/uploads', express.static('./uploads')) // serve uploaded images from the 'Uploads' directory
 app.use("/admin", require("./Routes/adminRoutes"))
 app.use("/booking", require('./Routes/bookingRoute'))
+app.use("/wishlist", require('./Routes/wishlistRoute'))
+app.use("/review", require('./Routes/reviewRoute'))
+app.use("/cart", require('./Routes/cartRoute'))
+app.use((err, req, res, next) => {
+  if (err.message === "Invalid image type") {
+    return res.status(400).json({ message: err.message });
+  }
+
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ message: "File too large (max 2MB)" });
+  }
+
+  next(err);
+});

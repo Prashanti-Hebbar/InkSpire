@@ -1,7 +1,6 @@
+const SECRET_KEY = process.env.SECRET_KEY;
 const userTable = require("../Models/userModel")
 const jwt = require("jsonwebtoken")
-const SECRET_KEY = "product-crud"
-
 const bcrypt = require("bcryptjs");
 
 const adminLogin = async (req, res) => {

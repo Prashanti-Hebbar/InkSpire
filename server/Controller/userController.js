@@ -1,7 +1,9 @@
+const SECRET_KEY = process.env.SECRET_KEY;
 const userTable = require("../Models/userModel");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "product-crud";
 const bcrypt = require("bcryptjs");
+
+// console.log("SECRET (LOGIN):", SECRET_KEY);
 
 const registerUser = async (req, res) => {
   try {
@@ -162,6 +164,28 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    const user = await userTable.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: "Role updated",
+      user
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error updating role" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -171,4 +195,5 @@ module.exports = {
   updateUser,
   getprofile,
   updateProfile,
+  updateUserRole
 };

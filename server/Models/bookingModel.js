@@ -4,11 +4,11 @@ const bookingSchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: { type: Number },
   address: { type: String },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "bookUser", required: true },
 
   productId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
+    ref: "Book",
     required: true,
   },
 

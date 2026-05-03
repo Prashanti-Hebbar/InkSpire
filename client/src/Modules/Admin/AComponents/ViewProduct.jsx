@@ -40,14 +40,12 @@ export default function ViewProduct() {
   };
 
   const sorted = [...products].sort((a, b) =>
-    a[sortBy].toString().localeCompare(b[sortBy].toString())
+    a[sortBy].toString().localeCompare(b[sortBy].toString()),
   );
 
   const handleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -67,8 +65,13 @@ export default function ViewProduct() {
   const confirmDelete = async () => {
     await Promise.all(
       selected.map((id) =>
-        fetch(`/product/deleteProductById/${id}`, { method: "DELETE" })
-      )
+        fetch(`/product/deleteProductById/${id}`, {
+          method: "DELETE",
+          headers: {
+            "auth-token": localStorage.getItem("UserToken"),
+          },
+        }),
+      ),
     );
     setConfirmOpen(false);
     setSelected([]);
@@ -121,6 +124,7 @@ export default function ViewProduct() {
           <TableHead>
             <TableRow sx={{ background: "#3e2f1c" }}>
               <TableCell sx={{ color: "#fff" }}>Name</TableCell>
+              <TableCell sx={{ color: "#fff" }}>Author</TableCell>
               <TableCell sx={{ color: "#fff" }}>Price</TableCell>
               <TableCell sx={{ color: "#fff" }}>Quantity</TableCell>
               <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
@@ -130,18 +134,15 @@ export default function ViewProduct() {
           <TableBody>
             {sorted.map((p) => (
               <TableRow key={p._id}>
-              
-
                 <TableCell>{p.name}</TableCell>
+                <TableCell>{p.author}</TableCell>
                 <TableCell>₹{p.price}</TableCell>
                 <TableCell>{p.quantity}</TableCell>
 
                 <TableCell>
                   <Button
                     size="small"
-                    onClick={() =>
-                      navigate(`/admin/product/update/${p._id}`)
-                    }
+                    onClick={() => navigate(`/admin/product/update/${p._id}`)}
                     sx={{ mr: 1, background: "#c8a97e", color: "#2b2115" }}
                   >
                     Update
@@ -163,9 +164,7 @@ export default function ViewProduct() {
       {/* CONFIRM MODAL */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Delete {selected.length} book(s)?
-        </DialogContent>
+        <DialogContent>Delete {selected.length} book(s)?</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
           <Button onClick={confirmDelete} color="error">

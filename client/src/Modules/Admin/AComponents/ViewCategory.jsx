@@ -69,7 +69,11 @@ export default function ViewCategory() {
   const confirmDelete = () => {
     Promise.all(
       selected.map((id) =>
-        axios.delete(`http://localhost:5000/category/deleteCategory/${id}`)
+        axios.delete(`http://localhost:5000/category/deleteCategory/${id}`,{
+        headers: {
+          "auth-token": localStorage.getItem("UserToken"),
+        },
+      })
       )
     ).then(() => {
       fetchCategories();

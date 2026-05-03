@@ -12,6 +12,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 
 export default function MyProfile() {
+  const [orders, setOrders] = useState([]);
   const [formdata, setFormdata] = useState({
     name: "",
     email: "",
@@ -37,6 +38,7 @@ export default function MyProfile() {
 
   const [edit, setEdit] = useState(false);
   const [tab, setTab] = useState(0);
+  const [wishlist, setWishlist] = useState([]);
 
   const token = localStorage.getItem("UserToken");
 
@@ -69,10 +71,6 @@ export default function MyProfile() {
     }
   };
 
-  useEffect(() => {
-    viewprofile();
-  }, []);
-
   const handleUpdate = async () => {
     const response = await axios.put(
       "http://localhost:5000/user/updateprofile",
@@ -88,6 +86,43 @@ export default function MyProfile() {
 
     setEdit(false);
   };
+
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/booking/userbookings",
+        {
+          headers: {
+            "auth-token": token,
+          },
+        },
+      );
+      setOrders(res.data.bdata || []);
+    } catch (error) {
+      console.log(error);
+      setOrders([]);
+    }
+  };
+
+  const fetchWishlist = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/wishlist/get", {
+        headers: {
+          "auth-token": localStorage.getItem("UserToken"),
+        },
+      });
+
+      setWishlist(res.data.wishlist);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    viewprofile();
+    fetchOrders();
+    fetchWishlist();
+  }, []);
 
   return (
     <Box
@@ -116,6 +151,7 @@ export default function MyProfile() {
         <Tab label="Profile" />
         <Tab label="Orders" />
         <Tab label="Wishlist" />
+        <Tab label="Settings" />
       </Tabs>
 
       {/* PROFILE */}
@@ -256,15 +292,142 @@ export default function MyProfile() {
 
       {/* ORDERS */}
       {tab === 1 && (
-        <Box p={4} background="#fff" borderRadius={4}>
-          <Typography>No orders yet 📦</Typography>
+        <Box>
+          {orders.length === 0 ? (
+            <Typography>No orders yet 📦</Typography>
+          ) : (
+            orders.map((order) => (
+              <Box
+                key={order._id}
+                sx={{
+                  p: 3,
+                  mb: 3,
+                  borderRadius: 4,
+                  background: "#fff",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+                }}
+              >
+                {/* 📚 PRODUCT NAME */}
+                <Typography fontWeight={700} fontSize={18}>
+                  {order.productId?.name || "Unknown Book"}
+                </Typography>
+
+                {/* 💰 PRICE */}
+                <Typography color="#555">
+                  Price: ₹{order.productId?.price || 0}
+                </Typography>
+
+                {/* 🔢 QUANTITY */}
+                <Typography>Quantity: {order.quantity}</Typography>
+
+                {/* 💵 TOTAL */}
+                <Typography>Total: ₹{order.totalamount}</Typography>
+
+                {/* 📦 STATUS */}
+                <Typography
+                  sx={{
+                    mt: 1,
+                    fontWeight: 600,
+                    color:
+                      order.bookingstatus === "Completed"
+                        ? "green"
+                        : order.bookingstatus === "Approved"
+                          ? "orange"
+                          : order.bookingstatus === "Pending"
+                            ? "#c8a97e"
+                            : "red",
+                  }}
+                >
+                  Status: {order.bookingstatus}
+                </Typography>
+              </Box>
+            ))
+          )}
         </Box>
       )}
 
       {/* WISHLIST */}
       {tab === 2 && (
-        <Box p={4} background="#fff" borderRadius={4}>
-          <Typography>No wishlist items ❤️</Typography>
+        <Box>
+          {wishlist.length === 0 ? (
+            <Typography textAlign="center" mt={4}>
+              No wishlist items ❤️
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(2, 1fr)",
+                  md: "repeat(3, 1fr)",
+                },
+                gap: 3,
+              }}
+            >
+              {wishlist.map((item) => (
+                <Box
+                  key={item._id}
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    background: "#fff",
+                    boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+                    textAlign: "center",
+                  }}
+                >
+                  {/* IMAGE */}
+                  <Box
+                    component="img"
+                    src={`http://localhost:5000/uploads/${item.productId.productimage}`}
+                    alt={item.productId.name}
+                    sx={{
+                      width: "100%",
+                      height: 180,
+                      objectFit: "contain",
+                      mb: 2,
+                    }}
+                  />
+
+                  {/* NAME */}
+                  <Typography fontWeight={600} mb={1}>
+                    {item.productId.name}
+                  </Typography>
+
+                  {/* PRICE */}
+                  <Typography sx={{ color: "#c8a97e", fontWeight: 700 }}>
+                    ₹{item.productId.price}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {tab === 3 && (
+        <Box
+          sx={{
+            p: 4,
+            borderRadius: 4,
+            background: "#fff",
+            maxWidth: 500,
+          }}
+        >
+          <Typography fontWeight={600} mb={2}>
+            Account Settings
+          </Typography>
+
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/login";
+            }}
+          >
+            Logout
+          </Button>
         </Box>
       )}
     </Box>

@@ -24,6 +24,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import BookIcon from '@mui/icons-material/Book';
 
 export default function Sidebar({
   mobileOpen,
@@ -40,10 +41,10 @@ export default function Sidebar({
 
   const handleLogout = () => {
     localStorage.removeItem("UserToken");
-    localStorage.removeItem("role")
+    localStorage.removeItem("role");
 
     alert("Logged out successfully!");
-    navigate("/login", {replace: true});
+    navigate("/login", { replace: true });
   };
 
   const isActive = (path) => location.pathname === path;
@@ -95,6 +96,7 @@ export default function Sidebar({
             path: "/admin/dashboard",
           },
           { text: "Users", icon: <PeopleIcon />, path: "/admin/users" },
+          {text: "User Bookings", icon: <BookIcon />, path: "/admin/bookings"}
         ].map((item) => (
           <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
             <ListItemButton
@@ -129,7 +131,7 @@ export default function Sidebar({
             <ListItemIcon sx={{ color: "#fff" }}>
               <ShoppingCartIcon />
             </ListItemIcon>
-            <ListItemText primary="Products" />
+            <ListItemText primary="Books" />
             {productOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
         </ListItem>
@@ -138,12 +140,12 @@ export default function Sidebar({
           <List>
             {[
               {
-                text: "Add Product",
+                text: "Add Books",
                 path: "/admin/products/add",
                 icon: <AddCircleIcon />,
               },
               {
-                text: "View Products",
+                text: "View Books",
                 path: "/admin/products",
                 icon: <ViewListIcon />,
               },
@@ -188,12 +190,12 @@ export default function Sidebar({
           <List>
             {[
               {
-                text: "Add Category",
+                text: "Add Genres",
                 path: "/admin/category/add",
                 icon: <AddCircleIcon />,
               },
               {
-                text: "View Category",
+                text: "View Genres",
                 path: "/admin/category/view",
                 icon: <ViewListIcon />,
               },

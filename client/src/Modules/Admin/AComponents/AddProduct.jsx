@@ -17,6 +17,7 @@ import axios from "axios";
 export default function AddProduct() {
   const [formData, setFormData] = useState({
     name: "",
+    author: "",
     price: "",
     quantity: "",
     description: "",
@@ -60,6 +61,7 @@ export default function AddProduct() {
     e.preventDefault();
     const form = new FormData();
     form.append("name", formData.name);
+    form.append("author", formData.author);
     form.append("price", formData.price);
     form.append("quantity", formData.quantity);
     form.append("description", formData.description);
@@ -71,6 +73,9 @@ export default function AddProduct() {
         "http://localhost:5000/product/createProduct",
         {
           method: "POST",
+          headers: {
+            "auth-token": localStorage.getItem("UserToken"),
+          },
           body: form,
         },
       );
@@ -81,13 +86,16 @@ export default function AddProduct() {
         setSuccess(true);
         setFormData({
           name: "",
+          author: "",
           price: "",
           quantity: "",
           description: "",
           categoryId: "",
+          productimage: "",
         });
 
         setTimeout(() => setSuccess(false), 5000);
+        alert("Product added successfully!")
       } else {
         setError(data.message || "Failed to add product");
       }
@@ -98,7 +106,6 @@ export default function AddProduct() {
   };
   console.log("CATEGORY STATE:", category);
   return (
-    // Only UI upgraded — logic untouched
 
     <Box
       sx={{
@@ -135,12 +142,23 @@ export default function AddProduct() {
           Add a new story to your collection
         </Typography>
 
+        {success && <Alert severity="success">Product added</Alert>}
+
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
             label="Book Title"
             name="name"
             value={formData.name}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            fullWidth
+            label="Author"
+            name="author"
+            value={formData.author}
             onChange={handleChange}
             sx={{ mb: 2 }}
           />

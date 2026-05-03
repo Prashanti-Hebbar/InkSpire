@@ -17,6 +17,7 @@ export default function UpdateProduct() {
 
   const [product, setProduct] = useState({
     name: "",
+    author: "",
     price: "",
     quantity: "",
     description: "",
@@ -41,6 +42,7 @@ export default function UpdateProduct() {
 
     const form = new FormData();
     form.append("name", product.name);
+    form.append("author", product.author);
     form.append("price", product.price);
     form.append("quantity", product.quantity);
     form.append("description", product.description);
@@ -57,6 +59,7 @@ export default function UpdateProduct() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            "auth-token": localStorage.getItem("UserToken"),
           },
         },
       );
@@ -95,6 +98,14 @@ export default function UpdateProduct() {
           />
 
           <TextField
+            label="Author"
+            fullWidth
+            value={product.author}
+            onChange={(e) => setProduct({ ...product, author: e.target.value })}
+            sx={{ mb: 3 }}
+          />
+
+          <TextField
             label="Price"
             fullWidth
             type="number"
@@ -124,7 +135,11 @@ export default function UpdateProduct() {
             sx={{ mb: 2 }}
             InputLabelProps={{ shrink: true }}
           />
-          <img src={`http://localhost:5000/uploads/${product.productimage}`} alt="Current" width={150} />
+          <img
+            src={`http://localhost:5000/uploads/${product.productimage}`}
+            alt="Current"
+            width={150}
+          />
 
           <TextField
             label="Description"

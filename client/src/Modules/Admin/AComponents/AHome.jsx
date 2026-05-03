@@ -11,17 +11,34 @@ export default function AHome() {
 
   useEffect(() => {
     const loadData = async () => {
-      const users = await fetch("/user/getUser").then((r) => r.json());
-      const products = await fetch("/product/getProducts").then((r) =>
-        r.json(),
-      );
+      try {
+        const token = localStorage.getItem("UserToken");
 
-      setStats({
-        users: users.allusers?.length || 0,
-        products: products.products?.length || 0,
-        categories:
-          JSON.parse(localStorage.getItem("categories"))?.length || 0,
-      });
+        const usersRes = await fetch("http://localhost:5000/user/getUser", {
+          headers: { "auth-token": token },
+        });
+        const users = await usersRes.json();
+
+        const productsRes = await fetch(
+          "http://localhost:5000/product/getProducts",
+          { headers: { "auth-token": token } },
+        );
+        const products = await productsRes.json();
+
+        const categoriesRes = await fetch(
+          "http://localhost:5000/category/getCategories",
+          { headers: { "auth-token": token } },
+        );
+        const categories = await categoriesRes.json();
+
+        setStats({
+          users: users.allusers?.length || 0,
+          products: products.products?.length || 0,
+          categories: categories.categories?.length || 0,
+        });
+      } catch (err) {
+        console.log("Dashboard error:", err);
+      }
     };
 
     loadData();
@@ -66,9 +83,7 @@ export default function AHome() {
                   background: "rgba(255,255,255,0.6)",
                 }}
               >
-                <Typography color="text.secondary">
-                  {c.title}
-                </Typography>
+                <Typography color="text.secondary">{c.title}</Typography>
                 <Typography variant="h3" fontWeight={700}>
                   {c.value}
                 </Typography>

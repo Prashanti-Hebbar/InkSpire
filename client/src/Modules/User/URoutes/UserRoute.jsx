@@ -11,6 +11,9 @@ import ProductDetails from "../UComponents/ProductDetails";
 import MyProfile from "../UComponents/MyProfile";
 import Bookingform from "../UComponents/Bookingform";
 import UserProtectedRoute from "../UComponents/UserProtectedRoute";
+import CartPage from "../UComponents/CartPage";
+import CartCheckout from "../UComponents/CartCheckout";
+import UserOrders from "../UComponents/UserOrders";
 
 function AppContent() {
   const location = useLocation();
@@ -27,6 +30,9 @@ function AppContent() {
         <Route path="/products" element={<Products />} />
         <Route path="/login" element={<Login />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/cart-checkout" element={<CartCheckout />} />
+        <Route path="/orders" element={<UserOrders />} />
         <Route
           path="/getprofile"
           element={

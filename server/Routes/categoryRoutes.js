@@ -6,17 +6,18 @@ const {
   UpdateCategory,
   deleteCategory
 } = require('../Controller/categoryController');
+const { authuser, adminMiddleware } = require("../Middleware/Auth")
 
 const route = express.Router();
 
-route.post('/createCategory', createCategory);
+route.post('/createCategory', authuser, adminMiddleware, createCategory);
 
 route.get('/getCategories', getCategories);
 
 route.get('/getCategoryById/:id', getCategoryById);
 
-route.delete('/deleteCategory/:id', deleteCategory);
+route.delete('/deleteCategory/:id', authuser,adminMiddleware,deleteCategory);
 
-route.put('/UpdateCategory/:id', UpdateCategory);
+route.put('/UpdateCategory/:id',authuser,adminMiddleware, UpdateCategory);
 
 module.exports = route;

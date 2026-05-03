@@ -14,6 +14,7 @@ import UpdateCategory from "../AComponents/UpdateCategory";
 import UpdateProduct from "../AComponents/UpdateProduct";
 import ManageCategories from "../AComponents/ManageCategories";
 import UpdateUser from "../AComponents/UpdateUser";
+import ManageBookings from "../AComponents/ManageBookings";
 
 export default function AdminRoute() {
 const token = localStorage.getItem("UserToken");
@@ -41,6 +42,7 @@ const role = localStorage.getItem("role");
           <Route path="/product/update/:id" element={<UpdateProduct />} />
           <Route path="/ManageCategories" element={<ManageCategories />} />
           <Route path="/user/update/:id" element={<UpdateUser />} />
+          <Route path="/bookings" element={<ManageBookings />} />
 
           {/* fallback */}
           <Route path="*" element={<Navigate to="/admin/dashboard" />} />

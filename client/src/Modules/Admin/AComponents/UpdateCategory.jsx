@@ -35,7 +35,12 @@ export default function UpdateCategory() {
 
     axios.put(`http://localhost:5000/category/UpdateCategory/${id}`, {
       name: category
-    })
+    },
+  {
+    headers: {
+      "auth-token": localStorage.getItem("UserToken"),
+    },
+  })
       .then(() => {
         setSuccess(true);
 

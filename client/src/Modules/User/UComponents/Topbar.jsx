@@ -16,16 +16,19 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useContext } from "react";
+import { CartContext } from "./CartContext";
 
 const pages = [
   { name: "Home", path: "/user" },
   { name: "Books", path: "/user/products" },
   { name: "About", path: "/user/about" },
+  { name: "My orders", path: "/user/orders"},
 ];
 
 export default function Topbar() {
   const navigate = useNavigate();
-
+  const { cartCount } = useContext(CartContext);
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [username, setUsername] = useState(
@@ -142,8 +145,12 @@ export default function Topbar() {
         <Box display="flex" alignItems="center" gap={2}>
           {/* 🛒 CART */}
           <motion.div whileHover={{ scale: 1.1 }}>
-            <IconButton>
-              <Badge badgeContent={2} color="warning">
+            <IconButton onClick={() => navigate("/user/cart")}>
+              <Badge
+                badgeContent={cartCount}
+                color="warning"
+                invisible={cartCount === 0} // 🔥 hides when empty
+              >
                 <ShoppingCartIcon sx={{ color: "#3e2f1c" }} />
               </Badge>
             </IconButton>

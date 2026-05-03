@@ -1,6 +1,7 @@
-require("dotenv").config();
-const SECRET_KEY = process.env.SECRET_KEY;
 const jwt = require("jsonwebtoken");
+const SECRET_KEY = process.env.SECRET_KEY;
+
+// console.log("SECRET (MIDDLEWARE):", SECRET_KEY);
 
 const authuser = (req, res, next) => {
   try {
@@ -11,7 +12,7 @@ const authuser = (req, res, next) => {
         message: "No token, unauthorized",
       });
     }
-
+    
     const userinfo = jwt.verify(usertoken, SECRET_KEY);
 
     req.userid = userinfo.id;
@@ -33,4 +34,4 @@ const adminMiddleware = (req, res, next) => {
   next();
 };
 
-module.exports = authuser, adminMiddleware;
+module.exports = {authuser, adminMiddleware};

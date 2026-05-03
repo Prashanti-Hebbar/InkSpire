@@ -20,14 +20,21 @@ export default function AddCategory() {
     if (!category.trim()) return;
 
     axios
-      .post("http://localhost:5000/category/createCategory", {
-        name: category,
-      })
+      .post(
+        "http://localhost:5000/category/createCategory",
+        { name: category }, // ✅ body
+        {
+          headers: {
+            "auth-token": localStorage.getItem("UserToken"),
+          },
+        },
+      )
       .then(() => {
         setSuccess(true);
         setCategory("");
 
         setTimeout(() => setSuccess(false), 5000);
+        // alert("Category added successfully!");
       })
       .catch((err) => console.error(err));
   };

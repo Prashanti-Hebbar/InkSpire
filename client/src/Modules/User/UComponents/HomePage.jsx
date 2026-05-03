@@ -3,26 +3,44 @@ import { Box, Typography, TextField, Chip, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import axios from "axios";
 import Products from "./Products";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/product/getProducts")
       .then((res) => setProducts(res.data.products))
       .catch((err) => console.error(err));
+
+    axios
+      .get("http://localhost:5000/category/getCategories")
+      .then((res) => setCategories(res.data.categories))
+      .catch(console.error);
   }, []);
 
   const addToCart = (product) => {
     setCart((prev) => [...prev, product]);
   };
 
-  const filteredProducts = products.filter(
-    (p) => p.name && p.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchSearch =
+      p.name && p.name.toLowerCase().includes(search.toLowerCase());
+
+    const productCatId = p.categoryId?._id || p.categoryId;
+
+    const matchCategory =
+      !selectedCategory ||
+      productCatId?.toString() === selectedCategory?.toString();
+
+    return matchSearch && matchCategory;
+  });
 
   return (
     <Box
@@ -68,7 +86,7 @@ export default function HomePage() {
                 top: `${top}%`,
                 left: `${left}%`,
                 fontSize: `${size}px`,
-                opacity: 0.30,
+                opacity: 0.3,
                 filter: "blur(0.3px)",
               }}
             >
@@ -127,6 +145,7 @@ export default function HomePage() {
 
           <Box display="flex" gap={2}>
             <Button
+              onClick={() => navigate("/user/products")}
               variant="contained"
               sx={{
                 background: "#c8a97e",
@@ -136,20 +155,6 @@ export default function HomePage() {
               }}
             >
               Browse Books
-            </Button>
-
-            <Button
-              variant="outlined"
-              sx={{
-                borderColor: "#c8a97e",
-                color: "#c8a97e",
-                "&:hover": {
-                  borderColor: "#fff",
-                  color: "#fff",
-                },
-              }}
-            >
-              Explore Genres
             </Button>
           </Box>
         </Box>
@@ -193,26 +198,46 @@ export default function HomePage() {
         </Typography>
 
         <Box display="flex" gap={2} flexWrap="wrap">
-          {["Fantasy", "Technology", "Self Growth"].map((cat) => (
-            <motion.div key={cat} whileHover={{ y: -6 }}>
+          {categories.map((cat) => (
+            <motion.div key={cat._id} whileHover={{ y: -6 }}>
               <Box
+                onClick={() => setSelectedCategory(cat._id)}
                 sx={{
                   px: 3,
                   py: 1.5,
                   borderRadius: "999px",
-                  background: "rgba(255,255,255,0.6)",
-                  backdropFilter: "blur(10px)",
-                  boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
                   cursor: "pointer",
                   fontWeight: 500,
+
+                  background:
+                    selectedCategory === cat._id
+                      ? "#c8a97e"
+                      : "rgba(255,255,255,0.6)",
+
+                  color: selectedCategory === cat._id ? "#2b2115" : "#3e2f1c",
                 }}
               >
-                {cat}
+                {cat.name}
               </Box>
             </motion.div>
           ))}
         </Box>
       </Box>
+      {selectedCategory && (
+        <Button
+          onClick={() => setSelectedCategory(null)}
+          sx={{
+            mb: 4,
+            background: "rgba(255,255,255,0.6)",
+            borderRadius: 2,
+            color: "#3e2f1c",
+            "&:hover": { background: "rgba(255,255,255,0.8)" },
+            
+          }}
+        >
+          Clear Filter
+        </Button>
+      )}
 
       {/* 🧾 HEADER */}
       <Box
@@ -226,16 +251,6 @@ export default function HomePage() {
         <Typography variant="h5" fontWeight={700} sx={{ color: "#3e2f1c" }}>
           Available Books
         </Typography>
-
-        <Chip
-          label={`🛒 ${cart.length} items`}
-          sx={{
-            background: "#3e2f1c",
-            color: "#fff",
-            fontWeight: 600,
-            px: 2,
-          }}
-        />
       </Box>
 
       {/* 📦 PRODUCTS */}
@@ -254,7 +269,11 @@ export default function HomePage() {
             boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
           }}
         >
-          <Products products={filteredProducts} addToCart={addToCart} />
+          <Products
+            products={filteredProducts}
+            hideFilters={true}
+            addToCart={addToCart}
+          />
         </Box>
       </motion.div>
     </Box>

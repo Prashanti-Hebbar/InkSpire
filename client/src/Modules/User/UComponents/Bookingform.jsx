@@ -1,18 +1,14 @@
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Divider,
-} from "@mui/material";
+import { Box, Button, TextField, Typography, Divider } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 export default function Bookingform() {
   const { productId } = useParams();
-
+  const location = useLocation();
+  // const cart = location.state?.cart || [];
   const [booking, setBooking] = useState({
     fname: "",
     email: "",
@@ -25,36 +21,83 @@ export default function Bookingform() {
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  // const [cart, setCart] = useState([]);
+  
+
+// useEffect(() => {
+//   const fetchCart = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:5000/cart", {
+//         headers: {
+//           "auth-token": localStorage.getItem("UserToken"),
+//         },
+//       });
+
+//       setCart(res.data.cart?.items || []);
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+
+//   fetchCart();
+// }, []);
 
   const handleChange = (e) => {
-    if (e.target.name === "quantity") {
-      const quantity = e.target.value;
-      setBooking({
-        ...booking,
-        quantity,
-        totalamount: quantity * price,
-      });
-    } else {
-      setBooking({ ...booking, [e.target.name]: e.target.value });
-    }
-  };
+  if (e.target.name === "quantity") {
+    const quantity = Number(e.target.value);
+
+    setBooking({
+      ...booking,
+      quantity,
+      totalamount: quantity * price, 
+    });
+  } else {
+    setBooking({ ...booking, [e.target.name]: e.target.value });
+  }
+};
 
   useEffect(() => {
+    if(!productId) return;
+
     axios
       .get(`http://localhost:5000/product/getProductById/${productId}`)
       .then((res) => setPrice(res.data.product.price))
       .catch((error) => console.log(error));
-  }, []);
+
+    fetchUserDetails();
+  }, [productId]);
 
   const utoken = localStorage.getItem("UserToken");
+
+  const fetchUserDetails = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/user/getprofile", {
+        headers: {
+          "auth-token": utoken,
+        },
+      });
+
+      const user = res.data.udata;
+
+      setBooking((prev) => ({
+        ...prev,
+        fname: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
+      }));
+    } catch (err) {
+      console.log("User fetch error:", err.response?.data || err.message);
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       await axios.post(
         "http://localhost:5000/booking/createbooking",
-        { ...booking, productId },
-        { headers: { "auth-token": utoken } }
+        { ...booking, productId},
+        { headers: { "auth-token": utoken } },
       );
       setSuccess(true);
     } catch (error) {
@@ -69,8 +112,7 @@ export default function Bookingform() {
     <Box
       sx={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top, #f5f1e6, #e8dccb, #d6c3a3)",
+        background: "radial-gradient(circle at top, #f5f1e6, #e8dccb, #d6c3a3)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -122,11 +164,7 @@ export default function Bookingform() {
                 Complete Your Order
               </Typography>
 
-              <Typography
-                textAlign="center"
-                color="#7c6a58"
-                mb={3}
-              >
+              <Typography textAlign="center" color="#7c6a58" mb={3}>
                 Finish your purchase in a few steps
               </Typography>
 
@@ -136,9 +174,26 @@ export default function Bookingform() {
               </Typography>
 
               <Box display="flex" flexDirection="column" gap={2}>
-                <StyledInput label="Full Name" name="fname" onChange={handleChange} />
-                <StyledInput label="Email" name="email" onChange={handleChange} />
-                <StyledInput label="Phone" name="phone" onChange={handleChange} type="number" />
+                <StyledInput
+                  label="Full Name"
+                  name="fname"
+                  value={booking.fname}
+                  onChange={handleChange}
+                />
+                <StyledInput
+                  InputProps={{ readOnly: true }}
+                  label="Email"
+                  name="email"
+                  value={booking.email}
+                  onChange={handleChange}
+                />
+                <StyledInput
+                  label="Phone"
+                  name="phone"
+                  value={booking.phone}
+                  onChange={handleChange}
+                  type="number"
+                />
               </Box>
 
               <Divider sx={{ my: 3 }} />
@@ -151,6 +206,7 @@ export default function Bookingform() {
               <StyledInput
                 label="Address"
                 name="address"
+                value={booking.address}
                 onChange={handleChange}
                 multiline
                 rows={3}
@@ -164,8 +220,17 @@ export default function Bookingform() {
               </Typography>
 
               <Box display="flex" flexDirection="column" gap={2}>
-                <StyledInput label="Quantity" name="quantity" onChange={handleChange} type="number" />
-                <StyledInput label="Price" value={price} InputProps={{ readOnly: true }} />
+                <StyledInput
+                  label="Quantity"
+                  name="quantity"
+                  onChange={handleChange}
+                  type="number"
+                />
+                <StyledInput
+                  label="Price"
+                  value={price}
+                  InputProps={{ readOnly: true }}
+                />
                 <StyledInput
                   label="Total Amount"
                   value={booking.totalamount}

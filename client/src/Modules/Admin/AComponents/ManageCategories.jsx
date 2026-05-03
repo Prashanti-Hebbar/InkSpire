@@ -26,6 +26,7 @@ export default function ManageCategories() {
   const [open, setOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchCategories();
@@ -69,14 +70,17 @@ export default function ManageCategories() {
   const handleSubmit = async () => {
     try {
       const url = editingCategory
-        ? `/category/updateCategory/${editingCategory._id}`
+        ? `/category/UpdateCategory/${editingCategory._id}`
         : "/category/createCategory";
 
       const method = editingCategory ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("UserToken"),
+        },
         body: JSON.stringify({ name }),
       });
 
@@ -85,8 +89,9 @@ export default function ManageCategories() {
       if (res.ok) {
         fetchCategories();
         handleClose();
+        setError("");
       } else {
-        console.error(data.message);
+        setError(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -98,6 +103,10 @@ export default function ManageCategories() {
     try {
       const res = await fetch(`/category/deleteCategory/${id}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("UserToken"),
+        },
       });
 
       const data = await res.json();
@@ -133,12 +142,15 @@ export default function ManageCategories() {
 
       <Paper sx={{ borderRadius: 3 }}>
         <TableContainer>
+          {error && (
+            <Typography color="error" mb={2}>
+              {error}
+            </Typography>
+          )}
           <Table>
             <TableHead>
               <TableRow sx={{ background: "#667eea" }}>
-                <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                  #
-                </TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: 700 }}>#</TableCell>
                 <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
                   Name
                 </TableCell>
@@ -206,7 +218,7 @@ export default function ManageCategories() {
 
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit}>
+          <Button onClick={handleSubmit} disabled={!name.trim()}>
             {editingCategory ? "Update" : "Add"}
           </Button>
         </DialogActions>

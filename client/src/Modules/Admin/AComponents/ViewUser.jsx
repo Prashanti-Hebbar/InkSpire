@@ -39,20 +39,32 @@ export default function ViewUser() {
     });
   }, []);
 
-  // 🔥 SORT
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem("UserToken");
+
+      const res = await axios.get("http://localhost:5000/user/getUser", {
+        headers: {
+          "auth-token": token,
+        },
+      });
+
+      const data = res.data.allusers || [];
+      setUsers(data);
+      setFiltered(data);
+    } catch (err) {
+      console.log("User fetch error:", err.response?.data || err.message);
+    }
+  };
+
   useEffect(() => {
-    const sorted = [...users].sort((a, b) =>
-      a[sortBy].localeCompare(b[sortBy])
-    );
-    setFiltered(sorted);
-  }, [sortBy, users]);
+    fetchUsers();
+  }, []);
 
   // 🔥 SELECT
   const handleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -73,8 +85,12 @@ export default function ViewUser() {
   const confirmDelete = () => {
     Promise.all(
       selected.map((id) =>
-        axios.delete(`http://localhost:5000/user/deleteUserById/${id}`)
-      )
+        axios.delete(`http://localhost:5000/user/deleteUserById/${id}`, {
+          headers: {
+            "auth-token": localStorage.getItem("UserToken"),
+          },
+        }),
+      ),
     ).then(() => {
       const updated = users.filter((u) => !selected.includes(u._id));
       setUsers(updated);
@@ -85,10 +101,25 @@ export default function ViewUser() {
   };
 
   // 🔥 ROLE UI
-  const handleRoleChange = (id, role) => {
-    setUsers((prev) =>
-      prev.map((u) => (u._id === id ? { ...u, role } : u))
-    );
+  const handleRoleChange = async (id, role) => {
+    try {
+      const token = localStorage.getItem("UserToken");
+
+      await axios.put(
+        `http://localhost:5000/user/updateRole/${id}`,
+        { role },
+        {
+          headers: {
+            "auth-token": token,
+          },
+        },
+      );
+
+      // refresh users
+      fetchUsers();
+    } catch (err) {
+      console.log("Role update error:", err.response?.data || err.message);
+    }
   };
 
   return (
@@ -169,23 +200,12 @@ export default function ViewUser() {
             <TableHead>
               <TableRow
                 sx={{
-                  background:
-                    "linear-gradient(135deg, #3e2f1c, #2b2115)",
+                  background: "linear-gradient(135deg, #3e2f1c, #2b2115)",
                 }}
               >
-                <TableCell>
-                  <Checkbox
-                    checked={selected.length === filtered.length}
-                    onChange={handleSelectAll}
-                    sx={{ color: "#fff" }}
-                  />
-                </TableCell>
 
                 {["Name", "Email", "Role", "Actions"].map((h) => (
-                  <TableCell
-                    key={h}
-                    sx={{ color: "#fdf6e3", fontWeight: 700 }}
-                  >
+                  <TableCell key={h} sx={{ color: "#fdf6e3", fontWeight: 700 }}>
                     {h}
                   </TableCell>
                 ))}
@@ -204,12 +224,6 @@ export default function ViewUser() {
                     },
                   }}
                 >
-                  <TableCell>
-                    <Checkbox
-                      checked={selected.includes(user._id)}
-                      onChange={() => handleSelect(user._id)}
-                    />
-                  </TableCell>
 
                   {/* NAME */}
                   <TableCell>
@@ -224,9 +238,7 @@ export default function ViewUser() {
                       >
                         {user.name?.charAt(0)}
                       </Avatar>
-                      <Typography fontWeight={600}>
-                        {user.name}
-                      </Typography>
+                      <Typography fontWeight={600}>{user.name}</Typography>
                     </Box>
                   </TableCell>
 
@@ -253,6 +265,7 @@ export default function ViewUser() {
                   {/* ACTION */}
                   <TableCell>
                     <IconButton
+                    disabled={user.role === 'admin'}
                       onClick={() => handleDelete(user._id)}
                       sx={{
                         color: "#b91c1c",
