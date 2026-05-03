@@ -4,7 +4,7 @@ import { Box, Typography, Chip, Divider } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-export default function UserOrders() {
+export default function UserOrders({ externalOrders }) {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ export default function UserOrders() {
       navigate("/login");
       return;
     }
-    try {
+
       const res = await axios.get(
         "http://localhost:5000/booking/userbookings",
         {
@@ -24,16 +24,17 @@ export default function UserOrders() {
           },
         },
       );
-
       setOrders(res.data.bdata || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    };
 
-  useEffect(() => {
-    fetchOrders();
+      useEffect(() => {
+        if(!externalOrders) {
+            fetchOrders();
+        }
+    
   }, []);
+const finalOrders = externalOrders || orders;
+
 
   // 🎨 STATUS COLORS
   const statusColor = (status) => {
@@ -66,10 +67,10 @@ export default function UserOrders() {
         Your Orders 📚
       </Typography>
 
-      {orders.length === 0 ? (
+      {finalOrders.length === 0 ? (
         <Typography>No orders yet</Typography>
       ) : (
-        orders.map((order) => {
+        finalOrders.map((order) => {
           const product = order.productId;
 
           return (

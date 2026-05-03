@@ -23,7 +23,6 @@ const pages = [
   { name: "Home", path: "/user" },
   { name: "Books", path: "/user/products" },
   { name: "About", path: "/user/about" },
-  { name: "My orders", path: "/user/orders"},
 ];
 
 export default function Topbar() {

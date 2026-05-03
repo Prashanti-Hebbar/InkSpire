@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { motion } from "framer-motion";
+import UserOrders from "./UserOrders";
 
 export default function MyProfile() {
   const [orders, setOrders] = useState([]);
@@ -291,60 +292,7 @@ export default function MyProfile() {
       )}
 
       {/* ORDERS */}
-      {tab === 1 && (
-        <Box>
-          {orders.length === 0 ? (
-            <Typography>No orders yet 📦</Typography>
-          ) : (
-            orders.map((order) => (
-              <Box
-                key={order._id}
-                sx={{
-                  p: 3,
-                  mb: 3,
-                  borderRadius: 4,
-                  background: "#fff",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-                }}
-              >
-                {/* 📚 PRODUCT NAME */}
-                <Typography fontWeight={700} fontSize={18}>
-                  {order.productId?.name || "Unknown Book"}
-                </Typography>
-
-                {/* 💰 PRICE */}
-                <Typography color="#555">
-                  Price: ₹{order.productId?.price || 0}
-                </Typography>
-
-                {/* 🔢 QUANTITY */}
-                <Typography>Quantity: {order.quantity}</Typography>
-
-                {/* 💵 TOTAL */}
-                <Typography>Total: ₹{order.totalamount}</Typography>
-
-                {/* 📦 STATUS */}
-                <Typography
-                  sx={{
-                    mt: 1,
-                    fontWeight: 600,
-                    color:
-                      order.bookingstatus === "Completed"
-                        ? "green"
-                        : order.bookingstatus === "Approved"
-                          ? "orange"
-                          : order.bookingstatus === "Pending"
-                            ? "#c8a97e"
-                            : "red",
-                  }}
-                >
-                  Status: {order.bookingstatus}
-                </Typography>
-              </Box>
-            ))
-          )}
-        </Box>
-      )}
+      {tab === 1 && <UserOrders externalOrders={orders} />}
 
       {/* WISHLIST */}
       {tab === 2 && (
