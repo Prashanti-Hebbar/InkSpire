@@ -46,20 +46,23 @@ export default function UpdateProduct() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const form = new FormData();
+  const form = new FormData();
 
-    Object.keys(product).forEach((key) => {
-      if (key !== "productimage") {
-        form.append(key, product[key]);
-      }
-    });
+  // 🔥 send ONLY required fields
+  form.append("name", product.name);
+  form.append("author", product.author);
+  form.append("price", product.price);
+  form.append("quantity", product.quantity);
+  form.append("description", product.description);
 
-    if (product.productimage instanceof File) {
-      form.append("productimage", product.productimage);
-    }
+  // 🔥 image only if changed
+  if (product.productimage instanceof File) {
+    form.append("productimage", product.productimage);
+  }
 
+  try {
     await axios.put(
       `http://localhost:5000/product/updateProduct/${id}`,
       form,
@@ -73,7 +76,11 @@ export default function UpdateProduct() {
 
     setSuccess(true);
     setTimeout(() => navigate("/admin/products"), 1500);
-  };
+  } catch (err) {
+    console.error("🔥 UPDATE ERROR:", err.response?.data || err);
+    alert("Update failed. Check console.");
+  }
+};
 
   if (loading) {
     return (
