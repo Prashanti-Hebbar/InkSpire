@@ -69,7 +69,8 @@ const getUserBookings = async (req, res) => {
     const uid = req.userid;
     const bookings = await Bookingtable.find({ userId: uid })
       .populate("userId", "name email")
-      .populate("productId", "productimage name author price");
+      .populate("productId", "productimage name author price")
+      .sort({ bookingDate: -1 });
     res.status(200).json({message: "User bookings fetched successfully", bdata: bookings });
   } catch (error) {
     console.log(error);

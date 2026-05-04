@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography, Divider } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
@@ -21,6 +21,7 @@ export default function Bookingform() {
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
   // const [cart, setCart] = useState([]);
   
 
@@ -91,22 +92,20 @@ export default function Bookingform() {
     }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      await axios.post(
-        "http://localhost:5000/booking/createbooking",
-        { ...booking, productId},
-        { headers: { "auth-token": utoken } },
-      );
-      setSuccess(true);
-    } catch (error) {
-      console.log(error);
-      alert("Booking failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleProceedToPayment = () => {
+  if (!booking.quantity || !booking.totalamount) {
+    alert("Enter quantity first");
+    return;
+  }
+
+  navigate("/user/payments", {
+    state: {
+      amount: booking.totalamount,
+      productId,
+      quantity: booking.quantity,
+    },
+  });
+};
 
   return (
     <Box
@@ -243,7 +242,7 @@ export default function Bookingform() {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={handleSubmit}
+                  onClick={handleProceedToPayment}
                   disabled={loading}
                   sx={{
                     mt: 3,
@@ -257,7 +256,7 @@ export default function Bookingform() {
                     },
                   }}
                 >
-                  {loading ? "Processing..." : "Confirm Booking"}
+                  {loading ? "Processing..." : "Proceed to Payment"}
                 </Button>
               </motion.div>
             </>

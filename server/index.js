@@ -40,6 +40,7 @@ app.use("/booking", require('./Routes/bookingRoute'))
 app.use("/wishlist", require('./Routes/wishlistRoute'))
 app.use("/review", require('./Routes/reviewRoute'))
 app.use("/cart", require('./Routes/cartRoute'))
+app.use("/payment", require('./Routes/paymentRoute'))
 app.use((err, req, res, next) => {
   if (err.message === "Invalid image type") {
     return res.status(400).json({ message: err.message });

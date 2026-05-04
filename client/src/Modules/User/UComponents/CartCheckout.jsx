@@ -2,9 +2,11 @@ import { Box, Button, TextField, Typography, Divider } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function CartCheckout() {
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate();
   const [booking, setBooking] = useState({
     fname: "",
     email: "",
@@ -60,41 +62,19 @@ export default function CartCheckout() {
   );
 
   // 🔥 SUBMIT ORDER
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = () => {
+  if (!cartItems.length) {
+    alert("Cart is empty");
+    return;
+  }
 
-    try {
-      for (let item of cartItems) {
-        await axios.post(
-          "http://localhost:5000/booking/createbooking",
-          {
-            fname: booking.fname,
-            email: booking.email,
-            phone: booking.phone,
-            address: booking.address,
-            quantity: item.quantity,
-            productId: item.productId._id,
-            totalamount: item.productId.price * item.quantity,
-          },
-          {
-            headers: { "auth-token": utoken },
-          }
-        );
-      }
-
-      await axios.delete("http://localhost:5000/cart/clear", {
-        headers: { "auth-token": utoken },
-      });
-
-      setSuccess(true);
-      setCartItems([]);
-    } catch (err) {
-      console.log(err);
-      alert("Checkout failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  navigate("/user/payments", {
+    state: {
+      amount: total,
+      cartItems: cartItems, // 🔥 send full cart
+    },
+  });
+};
 
   return (
     <Box
@@ -282,7 +262,7 @@ export default function CartCheckout() {
                   onClick={handleSubmit}
                   disabled={loading}
                 >
-                  {loading ? "Processing..." : "Place Order"}
+                  {loading ? "Processing..." : "Proceed to Payment"}
                 </Button>
               </motion.div>
             </Box>

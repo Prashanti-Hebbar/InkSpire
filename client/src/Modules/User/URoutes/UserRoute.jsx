@@ -13,6 +13,8 @@ import Bookingform from "../UComponents/Bookingform";
 import UserProtectedRoute from "../UComponents/UserProtectedRoute";
 import CartPage from "../UComponents/CartPage";
 import CartCheckout from "../UComponents/CartCheckout";
+import PaymentPage from "../UComponents/PaymentPage";
+import PaymentHistory from "../UComponents/PaymentHistory";
 
 function AppContent() {
   const location = useLocation();
@@ -31,6 +33,8 @@ function AppContent() {
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/cart-checkout" element={<CartCheckout />} />
+        <Route path="/payments" element={<PaymentPage />} />
+        <Route path="/payment-history" element={<PaymentHistory />} />
         <Route
           path="/getprofile"
           element={

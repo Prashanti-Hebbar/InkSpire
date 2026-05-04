@@ -16,25 +16,22 @@ export default function UserOrders({ externalOrders }) {
       return;
     }
 
-      const res = await axios.get(
-        "http://localhost:5000/booking/userbookings",
-        {
-          headers: {
-            "auth-token": token,
-          },
-        },
-      );
-      setOrders(res.data.bdata || []);
-    };
+    const res = await axios.get("http://localhost:5000/booking/userbookings", {
+      headers: {
+        "auth-token": token,
+      },
+    });
+    setOrders(res.data.bdata || []);
+  };
 
-      useEffect(() => {
-        if(!externalOrders) {
-            fetchOrders();
-        }
-    
+  useEffect(() => {
+    if (!externalOrders) {
+      fetchOrders();
+    }
   }, []);
-const finalOrders = externalOrders || orders;
-
+  const finalOrders = (externalOrders || orders).sort(
+    (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate),
+  );
 
   // 🎨 STATUS COLORS
   const statusColor = (status) => {
@@ -51,6 +48,10 @@ const finalOrders = externalOrders || orders;
         return "#6b7280";
     }
   };
+
+  const steps = ["Pending", "Approved", "Completed"];
+
+  const getStepIndex = (status) => steps.indexOf(status);
 
   return (
     <Box
@@ -71,7 +72,7 @@ const finalOrders = externalOrders || orders;
         <Typography>No orders yet</Typography>
       ) : (
         finalOrders.map((order) => {
-          const product = order.productId;
+          const product = order.productId || {};
 
           return (
             <motion.div key={order._id} whileHover={{ scale: 1.02 }}>
@@ -147,19 +148,37 @@ const finalOrders = externalOrders || orders;
                   <Divider sx={{ my: 2 }} />
 
                   {/* STATUS + DATE */}
-                  <Box display="flex" justifyContent="space-between">
-                    <Chip
-                      label={order.bookingstatus}
-                      sx={{
-                        background: statusColor(order.bookingstatus),
-                        color: "#fff",
-                        fontWeight: 600,
-                      }}
-                    />
+                  <Box mt={2}>
+                    {steps.map((step, i) => {
+                      const active = i <= getStepIndex(order.bookingstatus);
 
-                    <Typography sx={{ fontSize: 13, color: "#7c6a58" }}>
-                      {new Date(order.bookingDate).toLocaleDateString()}
-                    </Typography>
+                      return (
+                        <Box
+                          key={step}
+                          display="flex"
+                          alignItems="center"
+                          mb={0.5}
+                        >
+                          <Box
+                            sx={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: "50%",
+                              background: active ? "#16a34a" : "#d1d5db",
+                              mr: 1,
+                            }}
+                          />
+                          <Typography
+                            sx={{
+                              fontSize: 12,
+                              color: active ? "#16a34a" : "#9ca3af",
+                            }}
+                          >
+                            {step}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
                   </Box>
                 </Box>
               </Box>
