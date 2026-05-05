@@ -11,6 +11,8 @@ import {
 import axios from "axios";
 import { motion } from "framer-motion";
 import UserOrders from "./UserOrders";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import IconButton from "@mui/material/IconButton";
 
 export default function MyProfile() {
   const [orders, setOrders] = useState([]);
@@ -124,6 +126,27 @@ export default function MyProfile() {
     fetchOrders();
     fetchWishlist();
   }, []);
+
+  const handleRemoveWishlist = async (productId) => {
+  try {
+    await axios.post(
+      "http://localhost:5000/wishlist/toggle",
+      { productId },
+      {
+        headers: {
+          "auth-token": localStorage.getItem("UserToken"),
+        },
+      }
+    );
+
+    fetchWishlist();
+
+    alert("Removed from wishlist ❌");
+
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   return (
     <Box
@@ -322,8 +345,20 @@ export default function MyProfile() {
                     background: "#fff",
                     boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
                     textAlign: "center",
+                    position: "relative",
                   }}
                 >
+                  <IconButton
+                    onClick={() => handleRemoveWishlist(item.productId._id)}
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      color: "red",
+                    }}
+                  >
+                    <FavoriteIcon />
+                  </IconButton>
                   {/* IMAGE */}
                   <Box
                     component="img"

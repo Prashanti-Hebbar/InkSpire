@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import Products from "./Products";
 import { useNavigate } from "react-router-dom";
+import Footer from "./Footer";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -276,6 +277,7 @@ export default function HomePage() {
           />
         </Box>
       </motion.div>
+      <Footer />
     </Box>
   );
 }

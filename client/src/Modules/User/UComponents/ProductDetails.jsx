@@ -8,6 +8,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { useContext } from "react";
 import { CartContext } from "../UComponents/CartContext";
 
+
 export default function ProductDetails() {
   const { fetchCartCount } = useContext(CartContext);
   const { id } = useParams();
@@ -21,43 +22,43 @@ export default function ProductDetails() {
   const navigate = useNavigate();
 
   const handleWishlist = async () => {
-    try {
-      console.log("CLICKED");
+  try {
+    const token = localStorage.getItem("UserToken");
 
-      const token = localStorage.getItem("UserToken");
-      const pid = product?._id || product?.id;
-
-      console.log("TOKEN:", token);
-      console.log("PRODUCT ID:", pid);
-
-      if (!pid) {
-        console.log("NO PRODUCT ID");
-        return;
-      }
-
-      const res = await axios.post(
-        "http://localhost:5000/wishlist/toggle",
-        { productId: pid },
-        {
-          headers: {
-            "auth-token": token,
-          },
-        },
-      );
-
-      console.log("✅ RESPONSE:", res.data);
-
-      if (res.data.message === "Added to wishlist") {
-        setLiked(true);
-      } else {
-        setLiked(false);
-      }
-    } catch (err) {
-      console.log("ERROR:", err.response?.data || err.message);
+    if (!token) {
+      alert("Login first");
+      return;
     }
-  };
+
+    // 🔥 store previous state
+    const wasLiked = liked;
+
+    await axios.post(
+      "http://localhost:5000/wishlist/toggle",
+      { productId: product._id },
+      {
+        headers: {
+          "auth-token": token,
+        },
+      }
+    );
+
+    await fetchWishlist();
+
+    // 🔥 correct alert based on previous state
+    if (wasLiked) {
+      alert("Removed from wishlist ❌");
+    } else {
+      alert("Added to wishlist ❤️");
+    }
+
+  } catch (err) {
+    console.log("Wishlist error:", err.response?.data || err.message);
+  }
+};
 
   useEffect(() => {
+    if (!id) return;
     fetchProduct();
     fetchWishlist();
     fetchReviews();
@@ -83,7 +84,7 @@ export default function ProductDetails() {
       });
 
       const exists = res.data.wishlist.find(
-        (item) => item.productId?._id === id,
+        (item) => item.productId?._id.toString() === id,
       );
 
       setLiked(!!exists);
@@ -167,32 +168,32 @@ export default function ProductDetails() {
   }
 
   const addToCart = async () => {
-  const token = localStorage.getItem("UserToken");
+    const token = localStorage.getItem("UserToken");
 
-  if (!token) {
-    alert("Please login first");
-    return;
-  }
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
 
-  try {
-    await axios.post(
-      "http://localhost:5000/cart/add",
-      { productId: product._id },
-      {
-        headers: {
-          "auth-token": token,
+    try {
+      await axios.post(
+        "http://localhost:5000/cart/add",
+        { productId: product._id },
+        {
+          headers: {
+            "auth-token": token,
+          },
         },
-      }
-    );
+      );
 
-    fetchCartCount(); // 🔥 THIS LINE UPDATES BADGE
+      fetchCartCount(); // 🔥 THIS LINE UPDATES BADGE
 
-    alert("Added to cart");
-    navigate("/user/cart")
-  } catch (err) {
-    console.log(err);
-  }
-};
+      alert("Added to cart");
+      navigate("/user/cart");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Box
@@ -380,26 +381,15 @@ export default function ProductDetails() {
 
             {/* ❤️ WISHLIST */}
             <Box mt={3}>
-              <motion.div
-                animate={{ scale: liked ? 1.2 : 1 }}
-                whileTap={{ scale: 1.4 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
+            
                 <IconButton
                   onClick={handleWishlist}
                   sx={{
-                    color: liked ? "#e63946" : "#3e2f1c",
-                    transition: "all 0.3s ease",
-                    transform: liked ? "scale(1.2)" : "scale(1)",
-                    boxShadow: liked ? "0 0 15px rgba(230,57,70,0.5)" : "none",
-                    "&:hover": {
-                      transform: "scale(1.2)",
-                    },
+                    color: liked ? "red" : "gray",
                   }}
                 >
                   <FavoriteIcon />
                 </IconButton>
-              </motion.div>
             </Box>
 
             {/* ACTIONS */}

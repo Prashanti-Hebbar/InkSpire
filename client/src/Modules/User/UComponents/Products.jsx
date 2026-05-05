@@ -19,8 +19,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
-export default function Products({ products: externalProducts = null, hideFilters = false }) {
+export default function Products({
+  products: externalProducts = null,
+  hideFilters = false,
+}) {
   const [products, setProducts] = useState(externalProducts || []);
   const [categories, setCategories] = useState([]);
   const [selectedcategory, setSelectedcategory] = useState("All");
@@ -31,8 +35,7 @@ export default function Products({ products: externalProducts = null, hideFilter
   const query = new URLSearchParams(location.search);
   const selectedCategory = query.get("category");
 
-  let filtered =
-  selectedCategory
+  let filtered = selectedCategory
     ? products.filter((p) => p.categoryId?._id === selectedCategory)
     : products;
 
@@ -40,12 +43,12 @@ export default function Products({ products: externalProducts = null, hideFilter
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-  if (externalProducts) {
-    setProducts(externalProducts); // 👈 USE HOMEPAGE DATA
-  } else {
-    fetchProducts(); // 👈 ONLY for products page
-  }
-}, [externalProducts]);
+    if (externalProducts) {
+      setProducts(externalProducts); // 👈 USE HOMEPAGE DATA
+    } else {
+      fetchProducts(); // 👈 ONLY for products page
+    }
+  }, [externalProducts]);
 
   useEffect(() => {
     fetchProducts();
@@ -65,9 +68,7 @@ export default function Products({ products: externalProducts = null, hideFilter
   };
 
   const fetchCategories = async () => {
-    const res = await axios.get(
-      "http://localhost:5000/category/getCategories"
-    );
+    const res = await axios.get("http://localhost:5000/category/getCategories");
     setCategories(res.data.categories);
   };
 
@@ -120,43 +121,48 @@ export default function Products({ products: externalProducts = null, hideFilter
 
       {/* FILTERS */}
       {!hideFilters && (
-      <Box display="flex" gap={3} mb={4} flexWrap="wrap" zIndex={2}>
-        <FormControl fullWidth>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={selectedcategory}
-            label="Category"
-            onChange={(e) => setSelectedcategory(e.target.value)}
-          >
-            <MenuItem value="All">All</MenuItem>
-            {categories.map((cat) => (
-              <MenuItem key={cat._id} value={cat._id}>
-                {cat.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box display="flex" gap={3} mb={4} flexWrap="wrap" zIndex={2}>
+          <FormControl fullWidth>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={selectedcategory}
+              label="Category"
+              onChange={(e) => setSelectedcategory(e.target.value)}
+            >
+              <MenuItem value="All">All</MenuItem>
+              {categories.map((cat) => (
+                <MenuItem key={cat._id} value={cat._id}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-        <FormControl sx={{ minWidth: 180 }}>
-          <InputLabel>Sort</InputLabel>
-          <Select
-            value={sort}
-            label="Sort"
-            onChange={(e) => setSort(e.target.value)}
-          >
-            <MenuItem value="">None</MenuItem>
-            <MenuItem value="low">Price: Low → High</MenuItem>
-            <MenuItem value="high">Price: High → Low</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Sort</InputLabel>
+            <Select
+              value={sort}
+              label="Sort"
+              onChange={(e) => setSort(e.target.value)}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="low">Price: Low → High</MenuItem>
+              <MenuItem value="high">Price: High → Low</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
       )}
 
       {/* 📚 SHELVES */}
-      <Box display="flex" flexDirection="column" gap={10} position="relative" zIndex={2}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        gap={10}
+        position="relative"
+        zIndex={2}
+      >
         {shelves.map((row, rowIndex) => (
           <Box key={rowIndex} sx={{ position: "relative" }}>
-            
             {/* LIGHT ABOVE SHELF */}
             <Box
               sx={{
@@ -201,8 +207,7 @@ export default function Products({ products: externalProducts = null, hideFilter
                 right: 0,
                 height: "20px",
                 borderRadius: "12px",
-                background:
-                  "linear-gradient(to bottom, #3e2f1c, #2b2115)",
+                background: "linear-gradient(to bottom, #3e2f1c, #2b2115)",
                 boxShadow:
                   "0 15px 30px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.2)",
               }}
@@ -225,8 +230,8 @@ function BookCard({ pdata, navigate }) {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const rotateY = ((x / rect.width) - 0.5) * 20;
-    const rotateX = ((y / rect.height) - 0.5) * -20;
+    const rotateY = (x / rect.width - 0.5) * 20;
+    const rotateX = (y / rect.height - 0.5) * -20;
 
     setRotate({ x: rotateX, y: rotateY });
   };
@@ -320,29 +325,57 @@ function BookCard({ pdata, navigate }) {
           sx={{
             display: "flex",
             justifyContent: "space-between",
+            alignItems: "center",
             px: 2,
             pb: 2,
           }}
         >
-          <Button
-            onClick={() => navigate(`/user/bookingform/${pdata._id}`)}
-            variant="contained"
-            size="small"
-            sx={{
-              background: "#c8a97e",
-              color: "#2b2115",
-            }}
-          >
-            Book
-          </Button>
+          {/* 🔥 PRIMARY CTA */}
+          <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              onClick={() => navigate(`/user/bookingform/${pdata._id}`)}
+              variant="contained"
+              size="small"
+              sx={{
+                px: 2.5,
+                borderRadius: "999px",
+                fontWeight: 600,
+                background: "linear-gradient(135deg, #c8a97e, #a6824f)",
+                color: "#2b2115",
+                boxShadow: "0 6px 15px rgba(0,0,0,0.25)",
+                textTransform: "none",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #d4b489, #b89668)",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.35)",
+                },
+              }}
+            >
+              Book Now
+            </Button>
+          </motion.div>
 
-          <Button
-            onClick={() => navigate(`/user/product/${pdata._id}`)}
-            variant="outlined"
-            size="small"
-          >
-            Details
-          </Button>
+          {/* 👁 SECONDARY ACTION */}
+          <motion.div whileHover={{ scale: 1.15 }}>
+            <Button
+              onClick={() => navigate(`/user/product/${pdata._id}`)}
+              sx={{
+                minWidth: "auto",
+                width: 42,
+                height: 42,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.05)",
+                color: "#3e2f1c",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                "&:hover": {
+                  background: "rgba(200,169,126,0.2)",
+                },
+              }}
+            >
+              <VisibilityIcon sx={{ fontSize: 22 }} />
+            </Button>
+          </motion.div>
         </CardActions>
       </Card>
     </motion.div>

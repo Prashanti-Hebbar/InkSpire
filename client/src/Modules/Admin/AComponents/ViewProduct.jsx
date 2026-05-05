@@ -20,6 +20,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function ViewProduct() {
   const [products, setProducts] = useState([]);
@@ -140,13 +141,15 @@ export default function ViewProduct() {
                 <TableCell>{p.quantity}</TableCell>
 
                 <TableCell>
-                  <Button
-                    size="small"
+                  <IconButton
                     onClick={() => navigate(`/admin/product/update/${p._id}`)}
-                    sx={{ mr: 1, background: "#c8a97e", color: "#2b2115" }}
+                    sx={{
+                      color: "#c8a97e",
+                      "&:hover": { background: "rgba(200,169,126,0.15)" },
+                    }}
                   >
-                    Update
-                  </Button>
+                    <EditIcon />
+                  </IconButton>
 
                   <IconButton
                     onClick={() => handleDelete(p._id)}

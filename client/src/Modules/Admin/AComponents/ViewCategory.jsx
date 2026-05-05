@@ -19,6 +19,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { IconButton } from "@mui/material";
 
 export default function ViewCategory() {
   const [categories, setCategories] = useState([]);
@@ -41,15 +44,13 @@ export default function ViewCategory() {
 
   // 🔥 SORT
   const sorted = [...categories].sort((a, b) =>
-    a[sortBy].localeCompare(b[sortBy])
+    a[sortBy].localeCompare(b[sortBy]),
   );
 
   // 🔥 SELECT
   const handleSelect = (id) => {
     setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((x) => x !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -69,12 +70,12 @@ export default function ViewCategory() {
   const confirmDelete = () => {
     Promise.all(
       selected.map((id) =>
-        axios.delete(`http://localhost:5000/category/deleteCategory/${id}`,{
-        headers: {
-          "auth-token": localStorage.getItem("UserToken"),
-        },
-      })
-      )
+        axios.delete(`http://localhost:5000/category/deleteCategory/${id}`, {
+          headers: {
+            "auth-token": localStorage.getItem("UserToken"),
+          },
+        }),
+      ),
     ).then(() => {
       fetchCategories();
       setSelected([]);
@@ -141,7 +142,6 @@ export default function ViewCategory() {
         <Table>
           <TableHead>
             <TableRow sx={{ background: "#3e2f1c" }}>
-              
               <TableCell sx={{ color: "#fff" }}>Category</TableCell>
               <TableCell sx={{ color: "#fff" }}>Actions</TableCell>
             </TableRow>
@@ -157,32 +157,32 @@ export default function ViewCategory() {
                   },
                 }}
               >
-                
-
                 <TableCell>{cat.name}</TableCell>
 
                 <TableCell>
-                  <Button
-                    size="small"
-                    onClick={() =>
-                      navigate(`/admin/category/update/${cat._id}`)
-                    }
-                    sx={{
-                      mr: 1,
-                      background: "#c8a97e",
-                      color: "#2b2115",
-                    }}
-                  >
-                    Update
-                  </Button>
+                  <TableCell>
+                    <IconButton
+                      onClick={() =>
+                        navigate(`/admin/category/update/${cat._id}`)
+                      }
+                      sx={{
+                        color: "#c8a97e",
+                        "&:hover": { background: "rgba(200,169,126,0.15)" },
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
 
-                  <Button
-                    size="small"
-                    onClick={() => handleDelete(cat._id)}
-                    sx={{ background: "#b91c1c", color: "#fff" }}
-                  >
-                    Delete
-                  </Button>
+                    <IconButton
+                      onClick={() => handleDelete(cat._id)}
+                      sx={{
+                        color: "#b91c1c",
+                        "&:hover": { background: "rgba(185,28,28,0.15)" },
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableCell>
               </TableRow>
             ))}
@@ -193,9 +193,7 @@ export default function ViewCategory() {
       {/* CONFIRM MODAL */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          Delete {selected.length} category(s)?
-        </DialogContent>
+        <DialogContent>Delete {selected.length} category(s)?</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
           <Button onClick={confirmDelete} color="error">
