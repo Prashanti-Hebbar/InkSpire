@@ -120,36 +120,160 @@ export default function Products({
       />
 
       {/* FILTERS */}
+      {/* FILTERS */}
       {!hideFilters && (
-        <Box display="flex" gap={3} mb={4} flexWrap="wrap" zIndex={2}>
-          <FormControl fullWidth>
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedcategory}
-              label="Category"
-              onChange={(e) => setSelectedcategory(e.target.value)}
-            >
-              <MenuItem value="All">All</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat._id} value={cat._id}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Box
+          sx={{
+            mb: 6,
+            position: "relative",
+            zIndex: 2,
+            borderRadius: "24px",
+            overflow: "hidden",
+            background: "rgba(255,248,235,0.55)",
+            backdropFilter: "blur(18px)",
+            border: "1px solid rgba(200,169,126,0.25)",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
+            p: { xs: 2, md: 3 },
+          }}
+        >
+          {/* TOP GLOW */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: -40,
+              left: "20%",
+              width: "60%",
+              height: 80,
+              background:
+                "radial-gradient(circle, rgba(255,220,150,0.25), transparent)",
+              filter: "blur(35px)",
+              pointerEvents: "none",
+            }}
+          />
 
-          <FormControl sx={{ minWidth: 180 }}>
-            <InputLabel>Sort</InputLabel>
-            <Select
-              value={sort}
-              label="Sort"
-              onChange={(e) => setSort(e.target.value)}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: {
+                xs: "flex-start",
+                md: "center",
+              },
+              flexDirection: {
+                xs: "column",
+                md: "row",
+              },
+              gap: 3,
+            }}
+          >
+            {/* LEFT SIDE */}
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: {
+                    xs: "1.4rem",
+                    md: "1.8rem",
+                  },
+                  fontWeight: 700,
+                  color: "#3e2f1c",
+                  mb: 0.5,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Explore Collection
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "rgba(62,47,28,0.7)",
+                  fontSize: "0.95rem",
+                }}
+              >
+                Browse premium books by category and price
+              </Typography>
+            </Box>
+
+            {/* RIGHT SIDE FILTERS */}
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                width: {
+                  xs: "100%",
+                  md: "auto",
+                },
+              }}
             >
-              <MenuItem value="">None</MenuItem>
-              <MenuItem value="low">Price: Low → High</MenuItem>
-              <MenuItem value="high">Price: High → Low</MenuItem>
-            </Select>
-          </FormControl>
+              {/* CATEGORY */}
+              <FormControl
+                sx={{
+                  minWidth: {
+                    xs: "100%",
+                    sm: 240,
+                  },
+                }}
+              >
+                <InputLabel>Category</InputLabel>
+
+                <Select
+                  value={selectedcategory}
+                  label="Category"
+                  onChange={(e) => setSelectedcategory(e.target.value)}
+                  sx={{
+                    borderRadius: "16px",
+                    background: "rgba(255,255,255,0.65)",
+                    "& fieldset": {
+                      borderColor: "rgba(200,169,126,0.35)",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#c8a97e",
+                    },
+                  }}
+                >
+                  <MenuItem value="All">All Categories</MenuItem>
+
+                  {categories.map((cat) => (
+                    <MenuItem key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* SORT */}
+              <FormControl
+                sx={{
+                  minWidth: {
+                    xs: "100%",
+                    sm: 220,
+                  },
+                }}
+              >
+                <InputLabel>Sort By</InputLabel>
+
+                <Select
+                  value={sort}
+                  label="Sort By"
+                  onChange={(e) => setSort(e.target.value)}
+                  sx={{
+                    borderRadius: "16px",
+                    background: "rgba(255,255,255,0.65)",
+                    "& fieldset": {
+                      borderColor: "rgba(200,169,126,0.35)",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#c8a97e",
+                    },
+                  }}
+                >
+                  <MenuItem value="">Featured</MenuItem>
+                  <MenuItem value="low">Price: Low → High</MenuItem>
+                  <MenuItem value="high">Price: High → Low</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
         </Box>
       )}
 
