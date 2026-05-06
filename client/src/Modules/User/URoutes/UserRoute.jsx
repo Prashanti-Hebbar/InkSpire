@@ -15,6 +15,9 @@ import CartPage from "../UComponents/CartPage";
 import CartCheckout from "../UComponents/CartCheckout";
 import PaymentPage from "../UComponents/PaymentPage";
 import PaymentHistory from "../UComponents/PaymentHistory";
+import PaymentGateway from "../UComponents/PaymentGateway";
+import OTPVerify from "../UComponents/OTPVerify";
+import PaymentSuccess from "../UComponents/PaymentSuccess";
 
 function AppContent() {
   const location = useLocation();
@@ -35,6 +38,9 @@ function AppContent() {
         <Route path="/cart-checkout" element={<CartCheckout />} />
         <Route path="/payments" element={<PaymentPage />} />
         <Route path="/payment-history" element={<PaymentHistory />} />
+        <Route path="/payment-gateway" element={<PaymentGateway />} />
+        <Route path="/otp-verify" element={<OTPVerify />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route
           path="/getprofile"
           element={

@@ -96,7 +96,7 @@ export default function Sidebar({
             path: "/admin/dashboard",
           },
           { text: "Users", icon: <PeopleIcon />, path: "/admin/users" },
-          {text: "User Bookings", icon: <BookIcon />, path: "/admin/bookings"}
+          {text: "User Bookings", icon: <BookIcon />, path: "/admin/orders"}
         ].map((item) => (
           <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
             <ListItemButton

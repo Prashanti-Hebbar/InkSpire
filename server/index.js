@@ -36,11 +36,12 @@ app.use('/product', require('./Routes/productRoutes')) // product-related endpoi
 app.use('/category', require('./Routes/categoryRoutes'));
 app.use('/uploads', express.static('./uploads')) // serve uploaded images from the 'Uploads' directory
 app.use("/admin", require("./Routes/adminRoutes"))
-app.use("/booking", require('./Routes/bookingRoute'))
+// app.use("/booking", require('./Routes/bookingRoute'))
 app.use("/wishlist", require('./Routes/wishlistRoute'))
 app.use("/review", require('./Routes/reviewRoute'))
 app.use("/cart", require('./Routes/cartRoute'))
 app.use("/payment", require('./Routes/paymentRoute'))
+app.use("/order", require('./Routes/orderRoutes'))
 app.use((err, req, res, next) => {
   if (err.message === "Invalid image type") {
     return res.status(400).json({ message: err.message });

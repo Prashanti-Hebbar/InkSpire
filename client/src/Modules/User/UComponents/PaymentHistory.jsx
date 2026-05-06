@@ -45,7 +45,7 @@ export default function PaymentHistory() {
             >
               <Typography fontWeight={600}>Amount: ₹{p.amount}</Typography>
 
-              <Typography>Booking ID: {p.bookingId?._id}</Typography>
+              <Typography>Transaction: {p.transactionId}</Typography>
 
               <Typography>Method: {p.paymentMethod}</Typography>
 
