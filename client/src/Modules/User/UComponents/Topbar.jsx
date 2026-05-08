@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useContext } from "react";
 import { CartContext } from "./CartContext";
+import logo from "../../../assets/logo.png";
 
 const pages = [
   { name: "Home", path: "/user" },
@@ -86,26 +87,38 @@ export default function Topbar() {
         sx={{
           justifyContent: "space-between",
           px: { xs: 2, md: 5 },
-          py: scrolled ? 1 : 2,
+          minHeight: "70px",
+          py: 0,
           transition: "0.3s",
         }}
       >
         {/* 🔥 LOGO */}
-        <Typography
-          variant="h5"
+        <Box
           onClick={() => navigate("/user")}
           sx={{
             cursor: "pointer",
-            fontWeight: 700,
-            color: "#3e2f1c",
-            letterSpacing: "1px",
             display: "flex",
             alignItems: "center",
-            gap: 1,
           }}
         >
-          📖 Inkspire
-        </Typography>
+          <Box
+            component="img"
+            src={logo}
+            alt="Inkspire Logo"
+            sx={{
+              height: { xs: 55, md: 70 },
+              width: "auto",
+              objectFit: "contain",
+              display: "block",
+
+              transition: "0.3s ease",
+
+              "&:hover": {
+                transform: "scale(1.03)",
+              },
+            }}
+          />
+        </Box>
 
         {/* DESKTOP NAV */}
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4 }}>
