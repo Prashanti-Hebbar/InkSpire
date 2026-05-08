@@ -171,7 +171,7 @@ export default function HomePage() {
         <Box mb={4}>
           <TextField
             fullWidth
-            placeholder="Search books, authors..."
+            placeholder="Search books..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{
