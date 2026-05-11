@@ -21,13 +21,43 @@ export default function ManageOrders() {
 
   const token = localStorage.getItem("UserToken");
 
+  // ✅ STRICT ORDER FLOW
+  const statusFlow = [
+    "Pending",
+    "Processing",
+    "Shipped",
+    "Delivered",
+  ];
+
+  // ✅ ONLY NEXT STATUS ALLOWED
+  const getAllowedStatuses = (currentStatus) => {
+    const currentIndex = statusFlow.indexOf(currentStatus);
+
+    // LOCK FINAL STATES
+    if (
+      currentStatus === "Delivered" ||
+      currentStatus === "Cancelled"
+    ) {
+      return [currentStatus];
+    }
+
+    return [
+      currentStatus,
+      statusFlow[currentIndex + 1],
+      "Cancelled",
+    ].filter(Boolean);
+  };
+
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/order/all-orders", {
-        headers: {
-          "auth-token": token,
+      const res = await axios.get(
+        "http://localhost:5000/order/all-orders",
+        {
+          headers: {
+            "auth-token": token,
+          },
         },
-      });
+      );
 
       setOrders(res.data.orders);
     } catch (err) {
@@ -158,7 +188,7 @@ export default function ManageOrders() {
         </Box>
       </motion.div>
 
-      {/* TABLE CONTAINER */}
+      {/* TABLE */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -178,7 +208,8 @@ export default function ManageOrders() {
             <TableHead>
               <TableRow
                 sx={{
-                  background: "linear-gradient(135deg, #3e2f1c, #2b2115)",
+                  background:
+                    "linear-gradient(135deg, #3e2f1c, #2b2115)",
                 }}
               >
                 {[
@@ -219,19 +250,23 @@ export default function ManageOrders() {
                     transition: "0.3s",
                   }}
                 >
+                  {/* USER */}
                   <TableCell
                     sx={{
                       color: "#3e2f1c",
                       fontWeight: 600,
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     {order.userId?.name}
                   </TableCell>
 
+                  {/* BOOKS */}
                   <TableCell
                     sx={{
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     {order.items.map((item) => (
@@ -241,11 +276,14 @@ export default function ManageOrders() {
                           mb: 1,
                           p: 1,
                           borderRadius: 2,
-                          background: "rgba(255,248,235,0.45)",
+                          background:
+                            "rgba(255,248,235,0.45)",
                           transition: "0.3s",
+
                           "&:hover": {
                             transform: "translateY(-2px)",
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+                            boxShadow:
+                              "0 8px 20px rgba(0,0,0,0.12)",
                           },
                         }}
                       >
@@ -270,19 +308,23 @@ export default function ManageOrders() {
                     ))}
                   </TableCell>
 
+                  {/* AMOUNT */}
                   <TableCell
                     sx={{
                       color: "#2b2115",
                       fontWeight: 700,
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     ₹{order.totalAmount}
                   </TableCell>
 
+                  {/* PAYMENT */}
                   <TableCell
                     sx={{
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     <Chip
@@ -305,26 +347,33 @@ export default function ManageOrders() {
                     />
                   </TableCell>
 
+                  {/* STATUS */}
                   <TableCell
                     sx={{
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     <Chip
                       label={order.orderStatus}
                       sx={{
-                        background: statusColor(order.orderStatus),
+                        background: statusColor(
+                          order.orderStatus,
+                        ),
                         color: "#fff",
                         fontWeight: 700,
                         borderRadius: "999px",
-                        boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+                        boxShadow:
+                          "0 8px 20px rgba(0,0,0,0.12)",
                       }}
                     />
                   </TableCell>
 
+                  {/* UPDATE STATUS */}
                   <TableCell
                     sx={{
-                      borderBottom: "1px solid rgba(200,169,126,0.15)",
+                      borderBottom:
+                        "1px solid rgba(200,169,126,0.15)",
                     }}
                   >
                     <Select
@@ -334,31 +383,41 @@ export default function ManageOrders() {
                         order.orderStatus === "Delivered" ||
                         order.orderStatus === "Cancelled"
                       }
-                      onChange={(e) => updateStatus(order._id, e.target.value)}
+                      onChange={(e) =>
+                        updateStatus(
+                          order._id,
+                          e.target.value,
+                        )
+                      }
                       sx={{
                         minWidth: 150,
                         borderRadius: 3,
-                        background: "rgba(255,255,255,0.55)",
+                        background:
+                          "rgba(255,255,255,0.55)",
                         backdropFilter: "blur(10px)",
 
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "1px solid rgba(200,169,126,0.25)",
-                        },
+                        "& .MuiOutlinedInput-notchedOutline":
+                          {
+                            border:
+                              "1px solid rgba(200,169,126,0.25)",
+                          },
 
                         "&:hover": {
-                          boxShadow: "0 0 20px rgba(200,169,126,0.25)",
+                          boxShadow:
+                            "0 0 20px rgba(200,169,126,0.25)",
                         },
                       }}
                     >
-                      <MenuItem value="Pending">Pending</MenuItem>
-
-                      <MenuItem value="Processing">Processing</MenuItem>
-
-                      <MenuItem value="Shipped">Shipped</MenuItem>
-
-                      <MenuItem value="Delivered">Delivered</MenuItem>
-
-                      <MenuItem value="Cancelled">Cancelled</MenuItem>
+                      {getAllowedStatuses(
+                        order.orderStatus,
+                      ).map((status) => (
+                        <MenuItem
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </TableCell>
                 </motion.tr>
